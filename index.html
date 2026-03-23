@@ -1,0 +1,1217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WrestlerOS — NCAA DI Rankings 2025–26</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Barlow+Condensed:wght@400;600;700;800;900&family=Barlow:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0a0c0f;--bg2:#111318;--bg3:#181c23;--bg4:#1e2330;
+  --border:rgba(255,255,255,0.07);--border2:rgba(255,255,255,0.13);
+  --text:#e8eaf0;--muted:#6b7280;--accent:#f5a623;--accent2:#e8593c;
+  --green:#22c55e;--red:#ef4444;--blue:#3b82f6;--purple:#a78bfa;
+  --fd:'Barlow Condensed',sans-serif;--fb:'Barlow',sans-serif;--fm:'DM Mono',monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:var(--fb);font-size:15px;line-height:1.6;min-height:100vh}
+/* NAV */
+nav{position:sticky;top:0;z-index:100;background:rgba(10,12,15,0.96);backdrop-filter:blur(16px);border-bottom:1px solid var(--border);padding:0 20px;display:flex;align-items:center;gap:16px;height:54px;flex-wrap:wrap}
+.logo{font-family:var(--fd);font-size:22px;font-weight:900;letter-spacing:.04em;color:var(--accent);white-space:nowrap}
+.logo span{color:var(--text)}
+.nav-links{display:flex;gap:2px;flex-wrap:wrap}
+.nav-tab{font-family:var(--fd);font-weight:600;font-size:12px;letter-spacing:.07em;text-transform:uppercase;padding:5px 10px;border-radius:5px;border:none;background:transparent;color:var(--muted);cursor:pointer;transition:all .15s;white-space:nowrap}
+.nav-tab:hover{color:var(--text);background:var(--bg3)}
+.nav-tab.active{color:var(--accent);background:rgba(245,166,35,.1)}
+.nav-right{margin-left:auto;display:flex;align-items:center;gap:8px}
+.live-dot{width:7px;height:7px;background:var(--green);border-radius:50%;animation:pulse 2s infinite;flex-shrink:0}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.6;transform:scale(.85)}}
+.live-label{font-family:var(--fm);font-size:11px;color:var(--green);white-space:nowrap}
+/* WEIGHT BAR */
+.weight-bar{background:var(--bg2);border-bottom:1px solid var(--border);padding:9px 20px;display:flex;gap:5px;flex-wrap:wrap;align-items:center}
+.wt-btn{font-family:var(--fd);font-weight:700;font-size:13px;letter-spacing:.04em;padding:4px 12px;border-radius:5px;border:1px solid var(--border);background:transparent;color:var(--muted);cursor:pointer;transition:all .15s;white-space:nowrap}
+.wt-btn:hover{border-color:var(--border2);color:var(--text)}
+.wt-btn.active{border-color:var(--accent);background:rgba(245,166,35,.1);color:var(--accent)}
+.wt-label{font-family:var(--fm);font-size:11px;color:var(--muted);margin-right:4px}
+/* MAIN */
+.main{max-width:1060px;margin:0 auto;padding:0 20px 80px}
+.view{display:none}
+.view.active{display:block}
+/* HERO */
+.hero{padding:24px 0 18px;border-bottom:1px solid var(--border)}
+.hero-top{display:flex;align-items:flex-end;justify-content:space-between;gap:14px;flex-wrap:wrap}
+.hero h1{font-family:var(--fd);font-weight:900;font-size:42px;line-height:1;letter-spacing:.02em}
+.hero h1 em{color:var(--accent);font-style:normal}
+.hero-sub{font-size:11px;color:var(--muted);margin-top:4px;font-family:var(--fm)}
+.hero-stats{display:flex;gap:12px;flex-wrap:wrap}
+.stat-pill{font-family:var(--fm);font-size:11px;color:var(--muted);border:1px solid var(--border);padding:5px 11px;border-radius:4px;text-align:center}
+.stat-pill strong{display:block;color:var(--text);font-size:17px;font-family:var(--fd);font-weight:700;line-height:1}
+/* RANKINGS TABLE */
+.rankings-header{display:flex;align-items:center;justify-content:space-between;padding:16px 0 10px;gap:10px;flex-wrap:wrap}
+.section-title{font-family:var(--fd);font-weight:700;font-size:17px;letter-spacing:.04em;color:var(--muted);text-transform:uppercase}
+.algo-badge{font-family:var(--fm);font-size:10px;color:var(--accent);border:1px solid rgba(245,166,35,.3);background:rgba(245,166,35,.06);padding:3px 9px;border-radius:4px}
+.rank-table{width:100%;border-collapse:collapse}
+.rank-table thead tr{border-bottom:2px solid var(--border2)}
+.rank-table th{font-family:var(--fm);font-size:10px;font-weight:500;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);padding:6px 10px;text-align:left}
+.rank-table th.r{text-align:right}
+.rank-row{border-bottom:1px solid var(--border);cursor:pointer;transition:background .1s}
+.rank-row:hover{background:var(--bg2)}
+.rank-row.gold{background:rgba(245,166,35,.04)}
+.rank-row td{padding:11px 10px;vertical-align:middle}
+.rank-num{font-family:var(--fd);font-size:24px;font-weight:900;color:var(--muted);width:40px;text-align:center;line-height:1}
+.rank-row.gold .rank-num{color:var(--accent)}
+.wrestler-name{font-family:var(--fd);font-weight:700;font-size:16px;letter-spacing:.02em;display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.wrestler-school{font-size:11px;color:var(--muted);font-family:var(--fm);margin-top:2px}
+.elo-bar-wrap{width:90px;background:var(--bg3);border-radius:2px;height:3px;overflow:hidden;margin-top:4px}
+.elo-bar{height:3px;border-radius:2px;background:var(--accent);transition:width .8s}
+.elo-val{font-family:var(--fm);font-size:12px;color:var(--text);text-align:right}
+.rec{font-family:var(--fm);font-size:12px;text-align:right;white-space:nowrap}
+.rec .w{color:var(--green)}.rec .l{color:var(--red)}
+.bonus-pct{font-family:var(--fm);font-size:10px;color:var(--muted);text-align:right}
+.wt-bar{display:flex;gap:2px;align-items:center;justify-content:flex-end;flex-wrap:wrap}
+.ws{height:14px;font-size:9px;font-family:var(--fm);display:flex;align-items:center;border-radius:2px;padding:0 4px;font-weight:500}
+.wp{background:rgba(239,68,68,.2);color:#ef4444}
+.wt_{background:rgba(245,166,35,.2);color:#f5a623}
+.wm{background:rgba(59,130,246,.2);color:#3b82f6}
+.wd{background:rgba(107,114,128,.2);color:#9ca3af}
+.du{color:var(--green);font-size:11px;font-family:var(--fm)}
+.dd{color:var(--red);font-size:11px;font-family:var(--fm)}
+.ds_{color:var(--muted);font-size:11px;font-family:var(--fm)}
+.badge{font-size:10px;font-family:var(--fm);padding:2px 6px;border-radius:3px;white-space:nowrap}
+.badge-champ{background:rgba(245,166,35,.15);border:1px solid rgba(245,166,35,.4);color:var(--accent)}
+.badge-pending{background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.3);color:var(--red)}
+.badge-conf{background:rgba(34,197,94,.12);border:1px solid rgba(34,197,94,.3);color:var(--green)}
+/* PROFILE */
+.prof-back{font-family:var(--fm);font-size:12px;color:var(--muted);border:none;background:none;cursor:pointer;padding:12px 0;display:flex;align-items:center;gap:5px}
+.prof-back:hover{color:var(--text)}
+.prof-hdr{display:grid;grid-template-columns:1fr auto;gap:20px;padding:18px 0;border-bottom:1px solid var(--border);align-items:start}
+.prof-name{font-family:var(--fd);font-weight:900;font-size:44px;line-height:1;letter-spacing:.02em}
+.prof-meta{font-family:var(--fm);font-size:12px;color:var(--muted);margin-top:6px;display:flex;gap:12px;flex-wrap:wrap}
+.prof-elo-card{text-align:center;padding:16px 22px;border:1px solid var(--border2);border-radius:8px;background:var(--bg2)}
+.prof-elo-lbl{font-family:var(--fm);font-size:10px;color:var(--muted);text-transform:uppercase}
+.prof-elo-num{font-family:var(--fd);font-weight:900;font-size:40px;color:var(--accent);line-height:1.1}
+.prof-elo-rank{font-family:var(--fm);font-size:11px;color:var(--muted);margin-top:3px}
+.stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:9px;padding:16px 0}
+.s-card{background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:13px}
+.s-lbl{font-family:var(--fm);font-size:10px;color:var(--muted);text-transform:uppercase}
+.s-val{font-family:var(--fd);font-weight:700;font-size:24px;line-height:1;margin-top:3px}
+.mh-title{font-family:var(--fd);font-weight:700;font-size:14px;letter-spacing:.04em;color:var(--muted);text-transform:uppercase;padding:6px 0 9px;display:flex;align-items:center;justify-content:space-between}
+.match-list{display:flex;flex-direction:column;gap:4px}
+.mc{display:grid;grid-template-columns:54px 1fr auto auto;align-items:center;gap:12px;padding:9px 13px;border-radius:6px;border:1px solid var(--border);background:var(--bg2)}
+.mc.pending-match{border-color:rgba(239,68,68,.3);background:rgba(239,68,68,.04)}
+.mr{font-family:var(--fd);font-weight:900;font-size:14px;text-align:center;padding:4px 0;border-radius:4px;letter-spacing:.05em}
+.mr-w{background:rgba(34,197,94,.12);color:var(--green)}
+.mr-l{background:rgba(239,68,68,.12);color:var(--red)}
+.m-opp{font-family:var(--fd);font-weight:700;font-size:13px}
+.m-sch{font-family:var(--fm);font-size:10px;color:var(--muted)}
+.m-date{font-family:var(--fm);font-size:10px;color:var(--muted);margin-top:1px}
+.m-type-tag{font-family:var(--fm);font-size:10px;font-weight:500;padding:2px 6px;border-radius:3px}
+.m-evt{font-family:var(--fm);font-size:10px;color:var(--muted);text-align:right;margin-top:2px}
+.elo-db{font-family:var(--fm);font-size:10px;padding:2px 6px;border-radius:3px;white-space:nowrap}
+.eu{background:rgba(34,197,94,.1);color:var(--green)}
+.el{background:rgba(239,68,68,.1);color:var(--red)}
+.confirm-btn{font-family:var(--fm);font-size:10px;padding:3px 8px;border-radius:4px;border:1px solid var(--green);background:rgba(34,197,94,.08);color:var(--green);cursor:pointer;transition:all .15s}
+.confirm-btn:hover{background:rgba(34,197,94,.18)}
+/* CAREER ELO CHART */
+.career-section{margin-top:6px;padding:14px;background:var(--bg2);border:1px solid var(--border);border-radius:8px}
+.career-lbl{font-family:var(--fm);font-size:10px;color:var(--muted);text-transform:uppercase;margin-bottom:8px}
+.career-chart{width:100%;height:60px;position:relative;overflow:visible}
+/* FORMS */
+.sub-wrap{padding:18px 0;max-width:600px}
+.sub-wrap h2{font-family:var(--fd);font-weight:700;font-size:24px;letter-spacing:.04em;margin-bottom:5px}
+.sub-wrap p{color:var(--muted);font-size:13px;margin-bottom:20px}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.ff{display:flex;flex-direction:column;gap:4px}
+.ff.full{grid-column:1/-1}
+label{font-family:var(--fm);font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}
+input,select,textarea{background:var(--bg2);border:1px solid var(--border2);border-radius:6px;color:var(--text);font-family:var(--fb);font-size:13px;padding:8px 11px;outline:none;width:100%;transition:border-color .15s}
+input:focus,select:focus,textarea:focus{border-color:var(--accent)}
+select option{background:var(--bg2)}
+.sub-btn{margin-top:16px;width:100%;background:var(--accent);color:#000;border:none;border-radius:6px;font-family:var(--fd);font-weight:900;font-size:14px;letter-spacing:.07em;text-transform:uppercase;padding:12px;cursor:pointer;transition:opacity .15s}
+.sub-btn:hover{opacity:.9}
+.sub-btn.sec{background:var(--bg3);color:var(--text);border:1px solid var(--border2);margin-top:8px}
+/* PENDING QUEUE */
+.pending-section{padding:16px 0;max-width:780px}
+.pending-section h3{font-family:var(--fd);font-weight:700;font-size:18px;letter-spacing:.04em;margin-bottom:12px;color:var(--muted);text-transform:uppercase}
+.pending-card{background:var(--bg2);border:1px solid var(--border2);border-radius:8px;padding:14px;margin-bottom:8px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.pending-info{font-family:var(--fm);font-size:12px;color:var(--muted)}
+.pending-info strong{color:var(--text);font-size:13px;font-family:var(--fd);font-weight:700}
+.pending-actions{display:flex;gap:6px}
+.pend-confirm{font-family:var(--fm);font-size:11px;padding:5px 12px;border-radius:5px;border:1px solid var(--green);background:rgba(34,197,94,.08);color:var(--green);cursor:pointer;transition:all .15s}
+.pend-confirm:hover{background:rgba(34,197,94,.2)}
+.pend-reject{font-family:var(--fm);font-size:11px;padding:5px 12px;border-radius:5px;border:1px solid var(--border2);background:transparent;color:var(--muted);cursor:pointer;transition:all .15s}
+.pend-reject:hover{background:var(--bg3);color:var(--red);border-color:var(--red)}
+.votes-pill{font-family:var(--fm);font-size:10px;padding:2px 7px;border-radius:3px;background:rgba(245,166,35,.1);color:var(--accent)}
+/* H2H MATCHUP SIMULATOR */
+.h2h-section{padding:18px 0;max-width:780px}
+.h2h-section h2{font-family:var(--fd);font-weight:700;font-size:24px;letter-spacing:.04em;margin-bottom:5px}
+.h2h-section p{color:var(--muted);font-size:13px;margin-bottom:20px}
+.h2h-selectors{display:grid;grid-template-columns:1fr auto 1fr;gap:16px;align-items:center;margin-bottom:20px}
+.vs-label{font-family:var(--fd);font-weight:900;font-size:28px;color:var(--muted);text-align:center}
+.h2h-card{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:20px;display:flex;flex-direction:column;align-items:center;gap:8px}
+.h2h-wrestler-name{font-family:var(--fd);font-weight:900;font-size:22px;text-align:center;letter-spacing:.02em}
+.h2h-school{font-family:var(--fm);font-size:11px;color:var(--muted)}
+.h2h-elo{font-family:var(--fm);font-size:12px;color:var(--muted)}
+.h2h-win-pct{font-family:var(--fd);font-weight:900;font-size:52px;line-height:1;color:var(--accent)}
+.h2h-win-label{font-family:var(--fm);font-size:11px;color:var(--muted)}
+.h2h-result{background:var(--bg3);border:1px solid var(--border2);border-radius:10px;padding:24px;text-align:center;margin-bottom:16px}
+.h2h-bar-wrap{background:var(--bg3);border-radius:4px;height:10px;overflow:hidden;margin-bottom:20px}
+.h2h-bar-inner{display:flex;height:100%}
+.h2h-bar-a{background:var(--accent);transition:width .6s}
+.h2h-bar-b{background:var(--blue);transition:width .6s;flex:1}
+.h2h-history{margin-top:8px}
+.h2h-history-title{font-family:var(--fm);font-size:11px;color:var(--muted);text-transform:uppercase;margin-bottom:8px}
+.h2h-past-match{display:flex;align-items:center;justify-content:space-between;padding:8px 12px;background:var(--bg2);border:1px solid var(--border);border-radius:5px;margin-bottom:4px;font-family:var(--fm);font-size:12px}
+.h2h-win-tag{padding:2px 7px;border-radius:3px;font-size:10px;font-weight:500}
+.h2h-calc-note{font-family:var(--fm);font-size:11px;color:var(--muted);text-align:center;margin-top:8px;line-height:1.6}
+/* ROSTER GAP */
+.roster-section{padding:18px 0;max-width:780px}
+.roster-section h2{font-family:var(--fd);font-weight:700;font-size:24px;letter-spacing:.04em;margin-bottom:5px}
+.roster-section p{color:var(--muted);font-size:13px;margin-bottom:20px}
+.roster-inputs{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-bottom:12px}
+.roster-input-wrap{display:flex;flex-direction:column;gap:3px}
+.roster-input-wrap label{font-family:var(--fm);font-size:10px;color:var(--muted);text-align:center}
+.roster-input-wrap input{text-align:center;font-size:12px;padding:7px 4px}
+.roster-btn{background:var(--accent);color:#000;border:none;border-radius:6px;font-family:var(--fd);font-weight:900;font-size:14px;letter-spacing:.07em;text-transform:uppercase;padding:11px 24px;cursor:pointer;transition:opacity .15s;margin-bottom:20px}
+.roster-btn:hover{opacity:.9}
+.gap-grid{display:flex;flex-direction:column;gap:8px}
+.gap-row{background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:14px;display:grid;grid-template-columns:80px 1fr auto;gap:14px;align-items:start}
+.gap-wt{font-family:var(--fd);font-weight:900;font-size:22px;line-height:1;color:var(--muted)}
+.gap-wt.weak{color:var(--red)}
+.gap-wt.strong{color:var(--green)}
+.gap-current{font-family:var(--fm);font-size:12px;margin-bottom:6px}
+.gap-current span{font-weight:500}
+.gap-targets-title{font-family:var(--fm);font-size:10px;color:var(--muted);text-transform:uppercase;margin-bottom:5px}
+.gap-wrestler-pill{display:inline-flex;align-items:center;gap:6px;background:var(--bg3);border:1px solid var(--border);border-radius:4px;padding:4px 8px;margin:2px;font-family:var(--fm);font-size:11px;cursor:pointer;transition:border-color .15s}
+.gap-wrestler-pill:hover{border-color:var(--accent);color:var(--accent)}
+.gap-strength{font-family:var(--fd);font-weight:700;font-size:20px;text-align:right;line-height:1}
+.gap-strength-lbl{font-family:var(--fm);font-size:10px;color:var(--muted);text-align:right}
+.strength-bar{width:100%;background:var(--bg3);border-radius:2px;height:4px;overflow:hidden;margin-top:4px}
+.strength-fill{height:4px;border-radius:2px;transition:width .6s}
+/* TEAM TABLE */
+.team-section{padding:18px 0}
+.team-section h2{font-family:var(--fd);font-weight:700;font-size:24px;letter-spacing:.04em;margin-bottom:14px}
+.team-table{width:100%;border-collapse:collapse}
+.team-table thead tr{border-bottom:2px solid var(--border2)}
+.team-table th{font-family:var(--fm);font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);padding:6px 12px;text-align:left}
+.team-table th.r{text-align:right}
+.team-row{border-bottom:1px solid var(--border);transition:background .1s}
+.team-row:hover{background:var(--bg2)}
+.team-row td{padding:11px 12px;font-family:var(--fm);font-size:12px;vertical-align:middle}
+.team-name{font-family:var(--fd);font-weight:700;font-size:15px}
+.team-pts-bar-wrap{width:140px;background:var(--bg3);border-radius:2px;height:4px;overflow:hidden}
+.team-pts-bar{height:4px;border-radius:2px;background:var(--accent)}
+/* HOW */
+.how-wrap{padding:18px 0;max-width:680px}
+.how-wrap h2{font-family:var(--fd);font-weight:700;font-size:24px;letter-spacing:.04em;margin-bottom:16px}
+.elo-box{background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:20px;font-family:var(--fm);font-size:13px;line-height:1.8;margin-bottom:16px}
+.formula{background:var(--bg3);border-left:2px solid var(--accent);padding:9px 13px;margin:9px 0;border-radius:0 4px 4px 0;color:var(--accent);font-size:13px}
+.wt-tbl{width:100%;border-collapse:collapse;margin-top:8px}
+.wt-tbl th,.wt-tbl td{padding:6px 12px;text-align:left;font-family:var(--fm);font-size:12px;border-bottom:1px solid var(--border)}
+.wt-tbl th{color:var(--muted);font-size:10px;text-transform:uppercase}
+.wt-tbl td:last-child{color:var(--accent)}
+/* TOAST */
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:var(--bg3);border:1px solid var(--green);color:var(--green);font-family:var(--fm);font-size:12px;padding:10px 20px;border-radius:8px;z-index:9999;opacity:0;pointer-events:none;transition:opacity .3s;white-space:nowrap}
+.toast.show{opacity:1}
+/* MODAL */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:500;display:none;align-items:center;justify-content:center}
+.modal-overlay.open{display:flex}
+.modal{background:var(--bg2);border:1px solid var(--border2);border-radius:12px;padding:28px;max-width:440px;width:90%;position:relative}
+.modal h3{font-family:var(--fd);font-weight:700;font-size:22px;letter-spacing:.04em;margin-bottom:6px}
+.modal p{font-size:13px;color:var(--muted);margin-bottom:16px}
+.modal-close{position:absolute;top:14px;right:14px;background:none;border:none;color:var(--muted);font-size:20px;cursor:pointer;line-height:1}
+.modal-close:hover{color:var(--text)}
+@media(max-width:600px){
+  .hero h1{font-size:32px}
+  .stats-grid{grid-template-columns:1fr 1fr}
+  .form-grid,.h2h-selectors{grid-template-columns:1fr}
+  .vs-label{display:none}
+  .mc{grid-template-columns:42px 1fr}
+  .m-type-tag,.m-evt{display:none}
+  .prof-hdr{grid-template-columns:1fr}
+  .roster-inputs{grid-template-columns:repeat(2,1fr)}
+  .gap-row{grid-template-columns:60px 1fr}
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="logo">Wrestler<span>OS</span></div>
+  <div class="nav-links">
+    <button class="nav-tab active"  onclick="showView('rankings')">Rankings</button>
+    <button class="nav-tab"         onclick="showView('h2h')">Matchup Sim</button>
+    <button class="nav-tab"         onclick="showView('roster')">Roster Gap</button>
+    <button class="nav-tab"         onclick="showView('teams')">Teams</button>
+    <button class="nav-tab"         onclick="showView('submit')">Submit Result</button>
+    <button class="nav-tab"         onclick="showView('how')">How It Works</button>
+  </div>
+  <div class="nav-right">
+    <div class="live-dot"></div>
+    <span class="live-label" id="pending-label">2025–26 · Post-NCAAs</span>
+  </div>
+</nav>
+
+<div class="weight-bar">
+  <span class="wt-label">Weight:</span>
+  <button class="wt-btn active" onclick="setWeight(125)">125</button>
+  <button class="wt-btn" onclick="setWeight(133)">133</button>
+  <button class="wt-btn" onclick="setWeight(141)">141</button>
+  <button class="wt-btn" onclick="setWeight(149)">149</button>
+  <button class="wt-btn" onclick="setWeight(157)">157</button>
+  <button class="wt-btn" onclick="setWeight(165)">165</button>
+  <button class="wt-btn" onclick="setWeight(174)">174</button>
+  <button class="wt-btn" onclick="setWeight(184)">184</button>
+  <button class="wt-btn" onclick="setWeight(197)">197</button>
+  <button class="wt-btn" onclick="setWeight(285)">285</button>
+</div>
+
+<div id="toast" class="toast"></div>
+
+<!-- MODAL for reporting -->
+<div class="modal-overlay" id="modal-overlay" onclick="closeModal(event)">
+  <div class="modal">
+    <button class="modal-close" onclick="document.getElementById('modal-overlay').classList.remove('open')">✕</button>
+    <h3>Confirm this result?</h3>
+    <p id="modal-text">Confirming as a second source helps verify accuracy before the ELO engine counts it.</p>
+    <div style="display:flex;gap:8px;margin-top:4px">
+      <button class="sub-btn" id="modal-confirm-btn" style="margin-top:0;flex:1">Confirm Result</button>
+      <button class="sub-btn sec" id="modal-reject-btn" style="flex:1">Dispute</button>
+    </div>
+  </div>
+</div>
+
+<div class="main">
+
+<!-- ═══ RANKINGS ═══ -->
+<div id="view-rankings" class="view active">
+  <div class="hero">
+    <div class="hero-top">
+      <div>
+        <h1 id="hero-title">125 lbs <em>Rankings</em></h1>
+        <div class="hero-sub">ELO-based · win-type weighted · 2025–26 NCAA DI · post-NCAAs · persisted locally</div>
+      </div>
+      <div class="hero-stats" id="hero-stats"></div>
+    </div>
+  </div>
+  <div class="rankings-header">
+    <div class="section-title" id="rank-section-title">125 lbs — algorithmic</div>
+    <div class="algo-badge">ELO · pin×1.4 · tf×1.25 · md×1.1 · dec×1.0</div>
+  </div>
+  <table class="rank-table">
+    <thead><tr>
+      <th style="width:46px">Rank</th>
+      <th>Wrestler</th>
+      <th class="r">Record</th>
+      <th class="r" style="min-width:80px">Win types</th>
+      <th class="r">ELO</th>
+      <th class="r">Δ base</th>
+    </tr></thead>
+    <tbody id="rankings-body"></tbody>
+  </table>
+</div>
+
+<!-- ═══ PROFILE ═══ -->
+<div id="view-profile" class="view">
+  <button class="prof-back" onclick="showView('rankings')">← back to rankings</button>
+  <div id="profile-content"></div>
+</div>
+
+<!-- ═══ MATCHUP SIMULATOR ═══ -->
+<div id="view-h2h" class="view">
+  <div class="h2h-section">
+    <h2>Matchup Simulator</h2>
+    <p>Select any two wrestlers at the same weight class. The ELO formula calculates win probability and shows head-to-head history.</p>
+    <div class="form-grid" style="max-width:400px;margin-bottom:16px">
+      <div class="ff"><label>Weight class</label>
+        <select id="h2h-weight" onchange="refreshH2HSelects()">
+          <option value="125">125 lbs</option><option value="133">133 lbs</option>
+          <option value="141">141 lbs</option><option value="149">149 lbs</option>
+          <option value="157">157 lbs</option><option value="165">165 lbs</option>
+          <option value="174">174 lbs</option><option value="184">184 lbs</option>
+          <option value="197">197 lbs</option><option value="285">285 lbs</option>
+        </select>
+      </div>
+    </div>
+    <div class="h2h-selectors">
+      <div class="ff"><label>Wrestler A</label><select id="h2h-a" onchange="runH2H()"></select></div>
+      <div class="vs-label">VS</div>
+      <div class="ff"><label>Wrestler B</label><select id="h2h-b" onchange="runH2H()"></select></div>
+    </div>
+    <div id="h2h-result"></div>
+  </div>
+</div>
+
+<!-- ═══ ROSTER GAP ANALYSIS ═══ -->
+<div id="view-roster" class="view">
+  <div class="roster-section">
+    <h2>Roster Gap Analysis</h2>
+    <p>Enter your roster's current ELO rating at each weight (or wrestler name). The system identifies your weakest positions and surfaces the top available recruits/transfers for each gap.</p>
+    <div class="roster-inputs" id="roster-inputs"></div>
+    <button class="roster-btn" onclick="runRosterAnalysis()">Analyze Roster Gaps</button>
+    <div id="gap-results"></div>
+  </div>
+</div>
+
+<!-- ═══ TEAMS ═══ -->
+<div id="view-teams" class="view">
+  <div class="team-section">
+    <h2>2026 NCAA Team Standings</h2>
+    <table class="team-table">
+      <thead><tr>
+        <th style="width:46px">Place</th><th>School</th>
+        <th class="r">Points</th><th class="r">Champs</th>
+        <th class="r" style="min-width:160px">Score</th>
+      </tr></thead>
+      <tbody id="team-body"></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ═══ SUBMIT ═══ -->
+<div id="view-submit" class="view">
+  <div class="sub-wrap">
+    <h2>Submit a match result</h2>
+    <p>Results need <strong style="color:var(--text)">2 confirmations</strong> before they count toward ELO. This prevents false data. Submit a result, then share the link so others can confirm it.</p>
+    <div class="form-grid">
+      <div class="ff"><label>Weight class</label>
+        <select id="sub-weight" onchange="refreshSubSelects()">
+          <option value="125">125 lbs</option><option value="133">133 lbs</option>
+          <option value="141">141 lbs</option><option value="149">149 lbs</option>
+          <option value="157">157 lbs</option><option value="165">165 lbs</option>
+          <option value="174">174 lbs</option><option value="184">184 lbs</option>
+          <option value="197">197 lbs</option><option value="285">285 lbs</option>
+        </select>
+      </div>
+      <div class="ff"><label>Win type</label>
+        <select id="win-type">
+          <option value="pin">Pin (Fall)</option>
+          <option value="tf">Tech fall</option>
+          <option value="md">Major decision</option>
+          <option value="dec" selected>Decision</option>
+        </select>
+      </div>
+      <div class="ff"><label>Winner</label><select id="winner-sel"></select></div>
+      <div class="ff"><label>Loser</label><select id="loser-sel"></select></div>
+      <div class="ff"><label>Score / time</label><input type="text" id="score-input" placeholder="e.g. 6-3 or 3:24"></div>
+      <div class="ff"><label>Date</label><input type="date" id="match-date"></div>
+      <div class="ff full"><label>Event name</label><input type="text" id="event-input" placeholder="e.g. 2026 NCAA Championships"></div>
+      <div class="ff full"><label>Your name / source (for verification)</label><input type="text" id="submitter-name" placeholder="e.g. Coach Smith or trackwrestling.com/…"></div>
+    </div>
+    <button class="sub-btn" onclick="submitMatch()">Submit for Verification</button>
+  </div>
+
+  <!-- PENDING QUEUE -->
+  <div class="pending-section">
+    <h3>Pending results <span id="pending-count-badge" class="badge badge-pending" style="font-size:11px;vertical-align:middle"></span></h3>
+    <p style="font-size:13px;color:var(--muted);margin-bottom:14px">These results have been submitted but need a second confirmation before they update the rankings.</p>
+    <div id="pending-list"></div>
+  </div>
+</div>
+
+<!-- ═══ HOW IT WORKS ═══ -->
+<div id="view-how" class="view">
+  <div class="how-wrap">
+    <h2>How WrestlerOS rankings work</h2>
+    <div class="elo-box">
+      <strong style="color:var(--text)">FloWrestling rankings are editorial.</strong> A small team makes judgment calls. There's no formula you can audit.<br><br>
+      <strong style="color:var(--text)">WrestlerOS is fully algorithmic.</strong> Every ranking has a mathematical reason. Based on ELO — the same system used in chess, NFL analytics (EPA), and esports.
+      <div class="formula">E(A) = 1 / (1 + 10^((ratingB − ratingA) / 400))</div>
+      <div class="formula">R'(A) = R(A) + K × winMultiplier × (result − expected)</div>
+      <strong style="color:var(--text)">Strength of schedule is automatic.</strong> Beating a 1800-rated wrestler gives far more ELO than beating a 1500. You can't pad your rating with weak wins — the math handles it.
+    </div>
+    <table class="wt-tbl">
+      <thead><tr><th>Win type</th><th>Multiplier</th><th>Typical ELO swing</th></tr></thead>
+      <tbody>
+        <tr><td>Pin (fall)</td><td>1.4×</td><td>+22 to +30</td></tr>
+        <tr><td>Tech fall</td><td>1.25×</td><td>+19 to +27</td></tr>
+        <tr><td>Major decision</td><td>1.1×</td><td>+17 to +24</td></tr>
+        <tr><td>Decision</td><td>1.0×</td><td>+15 to +22</td></tr>
+      </tbody>
+    </table>
+    <div class="elo-box" style="margin-top:16px">
+      <strong style="color:var(--text)">Data persistence:</strong> All user-submitted matches are saved to <code style="color:var(--accent)">localStorage</code> so they survive page reloads. Migrate to PostgreSQL to share data across users — the schema is identical to this in-browser model.<br><br>
+      <strong style="color:var(--text)">Verification system:</strong> User submissions need 2 confirmations before they affect ELO. This prevents trolling and builds trust with coaches — they know rankings aren't gameable.
+    </div>
+  </div>
+</div>
+
+</div><!-- /main -->
+
+<script>
+// ═══════════════════════════════════════════════════════
+// 1. ELO ENGINE
+// ═══════════════════════════════════════════════════════
+const WIN_MULT = {pin:1.4, tf:1.25, md:1.1, dec:1.0};
+const K = 32;
+function eloExp(rA,rB){ return 1/(1+Math.pow(10,(rB-rA)/400)); }
+function eloChg(rA,rB,type){ return Math.round(K*(WIN_MULT[type]||1)*(1-eloExp(rA,rB))); }
+
+// ═══════════════════════════════════════════════════════
+// 2. CORE DATASET — all 10 weights
+// ═══════════════════════════════════════════════════════
+const DB = {};
+
+DB[125]={wrestlers:[
+  {id:'125-1',name:'Luke Lilledahl',     school:'Penn State',    conf:'Big Ten',   yr:'Sr',base:1720,champ:'2026 NCAA Champ'},
+  {id:'125-2',name:'Eddie Ventresca',    school:'Virginia Tech', conf:'ACC',        yr:'Sr',base:1630},
+  {id:'125-3',name:'Nic Bouzakis',       school:'Ohio State',   conf:'Big Ten',    yr:'Jr',base:1615},
+  {id:'125-4',name:'Sheldon Seymour',    school:'Lehigh',       conf:'Patriot',    yr:'Sr',base:1595},
+  {id:'125-5',name:'Troy Spratley',      school:'OK State',     conf:'Big 12',     yr:'Fr',base:1580},
+  {id:'125-6',name:'Jore Volk',          school:'Minnesota',    conf:'Big Ten',    yr:'Sr',base:1560},
+  {id:'125-7',name:'Nico Provo',         school:'Stanford',     conf:'Pac-12',     yr:'Jr',base:1545},
+  {id:'125-8',name:'Marc-Anthony McGowan',school:'Princeton',   conf:'Ivy',        yr:'Sr',base:1520},
+  {id:'125-9',name:'Jacob Moran',        school:'Indiana',      conf:'Big Ten',    yr:'Jr',base:1510},
+  {id:'125-10',name:'Maximo Renteria',   school:'Oregon State', conf:'Pac-12',     yr:'So',base:1490},
+  {id:'125-11',name:'Dean Peterson',     school:'Iowa',         conf:'Big Ten',    yr:'Jr',base:1480},
+  {id:'125-12',name:'Vincent Robinson',  school:'NC State',     conf:'ACC',        yr:'Sr',base:1465},
+],matches:[
+  {w:'125-1',l:'125-8',t:'dec',sc:'2-1',  ev:'2026 NCAA Finals',         dt:'2026-03-22'},
+  {w:'125-1',l:'125-2',t:'dec',sc:'3-1',  ev:'2026 NCAA Semis',          dt:'2026-03-21'},
+  {w:'125-8',l:'125-7',t:'dec',sc:'4-2',  ev:'2026 NCAA Semis',          dt:'2026-03-21'},
+  {w:'125-1',l:'125-5',t:'md', sc:'11-2', ev:'2026 NCAA Quarters',       dt:'2026-03-20'},
+  {w:'125-5',l:'125-4',t:'dec',sc:'8-2',  ev:'2026 NCAA Quarters',       dt:'2026-03-20'},
+  {w:'125-2',l:'125-9',t:'dec',sc:'5-4',  ev:'2026 NCAA Quarters',       dt:'2026-03-20'},
+  {w:'125-9',l:'125-6',t:'dec',sc:'5-4',  ev:'2026 NCAA Quarters',       dt:'2026-03-20'},
+  {w:'125-3',l:'125-11',t:'dec',sc:'9-1', ev:'2026 NCAA Quarters',       dt:'2026-03-20'},
+  {w:'125-8',l:'125-3',t:'md', sc:'10-2', ev:'2026 NCAA Quarters',       dt:'2026-03-20'},
+  {w:'125-7',l:'125-12',t:'md',sc:'10-2', ev:'2026 NCAA 3rd place',      dt:'2026-03-22'},
+  {w:'125-1',l:'125-3',t:'md', sc:'9-1',  ev:'Big Ten Championships',    dt:'2026-03-08'},
+  {w:'125-1',l:'125-4',t:'tf', sc:'17-2', ev:'National Duals',           dt:'2026-01-11'},
+  {w:'125-2',l:'125-6',t:'dec',sc:'5-2',  ev:'Virginia Tech Open',       dt:'2026-01-25'},
+  {w:'125-3',l:'125-5',t:'dec',sc:'7-4',  ev:'CKLV',                     dt:'2025-11-23'},
+  {w:'125-4',l:'125-10',t:'pin',sc:'4:22',ev:'Lehigh Duals',             dt:'2026-02-01'},
+]};
+
+DB[133]={wrestlers:[
+  {id:'133-1',name:'Jax Forrest',        school:'OK State',     conf:'Big 12',     yr:'Fr',base:1720,champ:'2026 NCAA Champ'},
+  {id:'133-2',name:'Ben Davino',          school:'Ohio State',   conf:'Big Ten',    yr:'Fr',base:1655},
+  {id:'133-3',name:'Aaron Seidel',        school:'Virginia Tech',conf:'ACC',        yr:'Sr',base:1600},
+  {id:'133-4',name:'Marcus Blaze',        school:'Penn State',   conf:'Big Ten',    yr:'Jr',base:1575},
+  {id:'133-5',name:'Drake Ayala',         school:'Iowa',         conf:'Big Ten',    yr:'Sr',base:1555},
+  {id:'133-6',name:'Tyler Knox',          school:'Stanford',     conf:'Pac-12',     yr:'Jr',base:1540},
+  {id:'133-7',name:'Jacob Van Dee',       school:'Nebraska',     conf:'Big Ten',    yr:'Jr',base:1530},
+  {id:'133-8',name:'Lucas Byrd',          school:'Illinois',     conf:'Big Ten',    yr:'Sr',base:1510},
+  {id:'133-9',name:'Braxton Brown',       school:'Maryland',     conf:'Big Ten',    yr:'So',base:1495},
+  {id:'133-10',name:'Julian Farber',      school:'Northern Iowa',conf:'MVC',        yr:'Sr',base:1480},
+  {id:'133-11',name:'Gage Walker',        school:'Missouri',     conf:'SEC',        yr:'Sr',base:1470},
+  {id:'133-12',name:'Dominick Serrano',   school:'North Carolina',conf:'ACC',       yr:'Jr',base:1455},
+],matches:[
+  {w:'133-1',l:'133-2',t:'dec',sc:'5-2', ev:'2026 NCAA Finals',    dt:'2026-03-22'},
+  {w:'133-1',l:'133-4',t:'md', sc:'11-3',ev:'2026 NCAA Semis',     dt:'2026-03-21'},
+  {w:'133-2',l:'133-3',t:'dec',sc:'5-0', ev:'2026 NCAA Semis',     dt:'2026-03-21'},
+  {w:'133-1',l:'133-6',t:'tf', sc:'16-1',ev:'2026 NCAA Quarters',  dt:'2026-03-20'},
+  {w:'133-2',l:'133-7',t:'dec',sc:'5-3', ev:'2026 NCAA Quarters',  dt:'2026-03-20'},
+  {w:'133-3',l:'133-4',t:'dec',sc:'3-2', ev:'2026 NCAA Quarters',  dt:'2026-03-20'},
+  {w:'133-5',l:'133-6',t:'md', sc:'16-5',ev:'2026 NCAA 5th place', dt:'2026-03-22'},
+  {w:'133-7',l:'133-8',t:'dec',sc:'6-5', ev:'2026 NCAA 7th place', dt:'2026-03-22'},
+  {w:'133-1',l:'133-2',t:'tf', sc:'18-3',ev:'Big 12 Championships',dt:'2026-03-07'},
+  {w:'133-2',l:'133-5',t:'dec',sc:'6-4', ev:'Ohio State Duals',    dt:'2026-01-18'},
+  {w:'133-3',l:'133-8',t:'dec',sc:'5-0', ev:'ACC Championships',   dt:'2026-03-02'},
+  {w:'133-4',l:'133-9',t:'md', sc:'12-3',ev:'Big Ten Championships',dt:'2026-03-08'},
+]};
+
+DB[141]={wrestlers:[
+  {id:'141-1',name:'Sergio Vega',        school:'OK State',     conf:'Big 12',     yr:'Fr',base:1720,champ:'2026 NCAA Champ'},
+  {id:'141-2',name:'Jesse Mendez',       school:'Ohio State',   conf:'Big Ten',    yr:'Jr',base:1680},
+  {id:'141-3',name:'Luke Stanich',       school:'Lehigh',       conf:'Patriot',    yr:'Sr',base:1590},
+  {id:'141-4',name:'Anthony Echemendia', school:'Iowa State',   conf:'Big 12',     yr:'Sr',base:1575},
+  {id:'141-5',name:'Joey Olivieri',      school:'Rutgers',      conf:'Big Ten',    yr:'Sr',base:1555},
+  {id:'141-6',name:'Luke Simcox',        school:'North Carolina',conf:'ACC',       yr:'Jr',base:1540},
+  {id:'141-7',name:'Caedyn Ricciardi',   school:'Navy',         conf:'Patriot',    yr:'Jr',base:1525},
+  {id:'141-8',name:'Ryan Jack',          school:'NC State',     conf:'ACC',        yr:'Sr',base:1515},
+  {id:'141-9',name:'Nash Singleton',     school:'Ohio State',   conf:'Big Ten',    yr:'So',base:1505},
+  {id:'141-10',name:'Tyler Wells',       school:'Oklahoma',     conf:'Big 12',     yr:'Jr',base:1490},
+  {id:'141-11',name:'Aldo Hernandez',    school:'App State',    conf:'SBC',        yr:'Jr',base:1470},
+  {id:'141-12',name:'Matthew Martino',   school:'Princeton',    conf:'Ivy',        yr:'Sr',base:1450},
+],matches:[
+  {w:'141-1',l:'141-2',t:'dec',sc:'4-1', ev:'2026 NCAA Finals',    dt:'2026-03-22'},
+  {w:'141-1',l:'141-3',t:'dec',sc:'7-3', ev:'2026 NCAA Semis',     dt:'2026-03-21'},
+  {w:'141-2',l:'141-4',t:'md', sc:'12-4',ev:'2026 NCAA Semis',     dt:'2026-03-21'},
+  {w:'141-3',l:'141-4',t:'dec',sc:'6-4', ev:'2026 NCAA 3rd place', dt:'2026-03-22'},
+  {w:'141-5',l:'141-6',t:'dec',sc:'9-4', ev:'2026 NCAA 5th place', dt:'2026-03-22'},
+  {w:'141-7',l:'141-8',t:'dec',sc:'4-1', ev:'2026 NCAA 7th place', dt:'2026-03-22'},
+  {w:'141-1',l:'141-5',t:'tf', sc:'15-0',ev:'2026 NCAA Quarters',  dt:'2026-03-20'},
+  {w:'141-2',l:'141-9',t:'md', sc:'9-1', ev:'2026 NCAA Quarters',  dt:'2026-03-20'},
+  {w:'141-2',l:'141-3',t:'dec',sc:'8-2', ev:'Big Ten Championships',dt:'2026-03-08'},
+  {w:'141-1',l:'141-2',t:'dec',sc:'5-3', ev:'Big 12 Championships',dt:'2026-03-07'},
+  {w:'141-4',l:'141-5',t:'dec',sc:'7-5', ev:'Iowa State Duals',    dt:'2026-01-25'},
+]};
+
+DB[149]={wrestlers:[
+  {id:'149-1',name:'Aden Valencia',     school:'Stanford',     conf:'Pac-12',     yr:'Fr',base:1720,champ:'2026 NCAA Champ'},
+  {id:'149-2',name:'Shayne Van Ness',   school:'Penn State',   conf:'Big Ten',    yr:'Sr',base:1675},
+  {id:'149-3',name:'Lachlan McNeil',    school:'Michigan',     conf:'Big Ten',    yr:'Sr',base:1580},
+  {id:'149-4',name:'Collin Gaj',        school:'Virginia Tech',conf:'ACC',        yr:'Sr',base:1560},
+  {id:'149-5',name:'Koy Buesgens',      school:'NC State',     conf:'ACC',        yr:'Jr',base:1545},
+  {id:'149-6',name:'Caleb Tyus',        school:'SIU Edwardsville',conf:'OVC',     yr:'Sr',base:1530},
+  {id:'149-7',name:'Ethan Stiles',      school:'Ohio State',   conf:'Big Ten',    yr:'So',base:1525},
+  {id:'149-8',name:'Carter Young',      school:'Maryland',     conf:'Big Ten',    yr:'Jr',base:1510},
+  {id:'149-9',name:'Chance Lamer',      school:'Nebraska',     conf:'Big Ten',    yr:'Sr',base:1505},
+  {id:'149-10',name:'Kael Lauridsen',   school:'Nebraska',     conf:'Big Ten',    yr:'Sr',base:1490},
+  {id:'149-11',name:'Austin McBurney',  school:'Brown',        conf:'Ivy',        yr:'Sr',base:1470},
+  {id:'149-12',name:'Clayton Jones',    school:'Michigan State',conf:'Big Ten',   yr:'Sr',base:1450},
+],matches:[
+  {w:'149-1',l:'149-2',t:'dec',sc:'8-5', ev:'2026 NCAA Finals',    dt:'2026-03-22'},
+  {w:'149-2',l:'149-3',t:'dec',sc:'6-2', ev:'2026 NCAA Semis',     dt:'2026-03-21'},
+  {w:'149-1',l:'149-7',t:'dec',sc:'7-5', ev:'2026 NCAA Semis',     dt:'2026-03-21'},
+  {w:'149-3',l:'149-4',t:'dec',sc:'4-3', ev:'2026 NCAA 3rd place', dt:'2026-03-22'},
+  {w:'149-9',l:'149-4',t:'dec',sc:'3-1', ev:'2026 NCAA Quarters',  dt:'2026-03-20'},
+  {w:'149-8',l:'149-5',t:'dec',sc:'11-4',ev:'2026 NCAA Quarters',  dt:'2026-03-20'},
+  {w:'149-2',l:'149-8',t:'md', sc:'13-2',ev:'Big Ten Championships',dt:'2026-03-08'},
+  {w:'149-3',l:'149-6',t:'dec',sc:'5-2', ev:'Michigan Duals',      dt:'2026-01-18'},
+  {w:'149-4',l:'149-10',t:'pin',sc:'5:44',ev:'ACC Championships',  dt:'2026-03-02'},
+]};
+
+DB[157]={wrestlers:[
+  {id:'157-1',name:'Landon Robideau',  school:'OK State',    conf:'Big 12',     yr:'Fr',base:1720,champ:'2026 NCAA Champ'},
+  {id:'157-2',name:'Antrell Taylor',   school:'Nebraska',    conf:'Big Ten',    yr:'Sr',base:1680},
+  {id:'157-3',name:'PJ Duke',          school:'Penn State',  conf:'Big Ten',    yr:'Jr',base:1650},
+  {id:'157-4',name:'Meyer Shapiro',    school:'Cornell',     conf:'Ivy',        yr:'Sr',base:1590},
+  {id:'157-5',name:'Ty Watters',       school:'West Virginia',conf:'Big 12',    yr:'Jr',base:1570},
+  {id:'157-6',name:'Jude Swisher',     school:'Penn',        conf:'Ivy',        yr:'Sr',base:1545},
+  {id:'157-7',name:'Vinny Zerban',     school:'Iowa State',  conf:'Big 12',     yr:'Sr',base:1530},
+  {id:'157-8',name:'Charlie Millard',  school:'Minnesota',   conf:'Big Ten',    yr:'Jr',base:1520},
+  {id:'157-9',name:'Derek Raike',      school:'Ohio',        conf:'MAC',        yr:'Sr',base:1505},
+  {id:'157-10',name:'Jimmy Harrington',school:'Harvard',     conf:'Ivy',        yr:'Sr',base:1495},
+  {id:'157-11',name:'Luke Mechler',    school:'Wisconsin',   conf:'Big Ten',    yr:'Jr',base:1480},
+  {id:'157-12',name:'Cael Swensen',    school:'SD State',    conf:'Summit',     yr:'Sr',base:1460},
+],matches:[
+  {w:'157-1',l:'157-2',t:'dec',sc:'4-2', ev:'2026 NCAA Finals',    dt:'2026-03-22'},
+  {w:'157-1',l:'157-3',t:'dec',sc:'3-1', ev:'2026 NCAA Semis',     dt:'2026-03-21'},
+  {w:'157-2',l:'157-5',t:'dec',sc:'7-3', ev:'2026 NCAA Semis',     dt:'2026-03-21'},
+  {w:'157-3',l:'157-4',t:'dec',sc:'5-1', ev:'2026 NCAA 3rd place', dt:'2026-03-22'},
+  {w:'157-1',l:'157-3',t:'dec',sc:'3-1', ev:'2026 NCAA Quarters',  dt:'2026-03-20'},
+  {w:'157-2',l:'157-4',t:'dec',sc:'7-4', ev:'2026 NCAA Quarters',  dt:'2026-03-20'},
+  {w:'157-5',l:'157-6',t:'dec',sc:'7-1', ev:'2026 NCAA Quarters',  dt:'2026-03-20'},
+  {w:'157-2',l:'157-1',t:'dec',sc:'7-2', ev:'Big Ten Championships',dt:'2026-03-08'},
+  {w:'157-3',l:'157-2',t:'dec',sc:'3-2', ev:'Big Ten Championships',dt:'2026-03-08'},
+  {w:'157-1',l:'157-7',t:'md', sc:'11-3',ev:'Big 12 Championships',dt:'2026-03-07'},
+  {w:'157-4',l:'157-6',t:'dec',sc:'8-4', ev:'EIWA Championships',  dt:'2026-03-01'},
+]};
+
+DB[165]={wrestlers:[
+  {id:'165-1',name:'Mitchell Mesenbrink',school:'Penn State',  conf:'Big Ten',    yr:'Jr',base:1720,champ:'2026 NCAA Champ'},
+  {id:'165-2',name:'Mikey Caliendo',      school:'Iowa',       conf:'Big Ten',    yr:'Jr',base:1630},
+  {id:'165-3',name:'Joey Blaze',          school:'Purdue',     conf:'Big Ten',    yr:'Sr',base:1600},
+  {id:'165-4',name:'Hunter Garvin',       school:'Stanford',   conf:'Pac-12',     yr:'Sr',base:1565},
+  {id:'165-5',name:'Bryce Hepner',        school:'North Carolina',conf:'ACC',     yr:'Sr',base:1545},
+  {id:'165-6',name:'LaDarion Lockett',    school:'OK State',   conf:'Big 12',     yr:'So',base:1530},
+  {id:'165-7',name:'Nicco Ruiz',          school:'Arizona State',conf:'Big 12',   yr:'Jr',base:1525},
+  {id:'165-8',name:'EJ Parco',            school:'Stanford',   conf:'Pac-12',     yr:'Jr',base:1520},
+  {id:'165-9',name:'LJ Araujo',           school:'Nebraska',   conf:'Big Ten',    yr:'Jr',base:1505},
+  {id:'165-10',name:'Will Denny',         school:'NC State',   conf:'ACC',        yr:'Sr',base:1495},
+  {id:'165-11',name:'Ryder Downey',       school:'Northern Iowa',conf:'MVC',      yr:'Sr',base:1480},
+  {id:'165-12',name:'Cesar Alvan',        school:'Columbia',   conf:'Ivy',        yr:'Sr',base:1465},
+],matches:[
+  {w:'165-1',l:'165-2',t:'tf', sc:'20-4', ev:'2026 NCAA Finals',    dt:'2026-03-22'},
+  {w:'165-1',l:'165-5',t:'dec',sc:'6-0',  ev:'2026 NCAA Semis',     dt:'2026-03-21'},
+  {w:'165-2',l:'165-3',t:'dec',sc:'8-5',  ev:'2026 NCAA Semis',     dt:'2026-03-21'},
+  {w:'165-3',l:'165-4',t:'dec',sc:'5-2',  ev:'2026 NCAA 3rd place', dt:'2026-03-22'},
+  {w:'165-5',l:'165-10',t:'dec',sc:'3-0', ev:'2026 NCAA Quarters',  dt:'2026-03-20'},
+  {w:'165-1',l:'165-2',t:'md', sc:'11-2', ev:'Big Ten Championships',dt:'2026-03-08'},
+  {w:'165-2',l:'165-3',t:'dec',sc:'4-3',  ev:'Big Ten Championships',dt:'2026-03-07'},
+  {w:'165-1',l:'165-4',t:'tf', sc:'19-4', ev:'National Duals',      dt:'2026-01-10'},
+  {w:'165-4',l:'165-6',t:'pin',sc:'3:14', ev:'Stanford Open',       dt:'2025-11-15'},
+  {w:'165-5',l:'165-10',t:'dec',sc:'4-1', ev:'ACC Championships',   dt:'2026-03-02'},
+]};
+
+DB[174]={wrestlers:[
+  {id:'174-1',name:'Levi Haines',         school:'Penn State',  conf:'Big Ten',    yr:'Sr',base:1720,champ:'2026 NCAA Champ'},
+  {id:'174-2',name:'Christopher Minto',   school:'Nebraska',    conf:'Big Ten',    yr:'Jr',base:1640},
+  {id:'174-3',name:'Patrick Kennedy',     school:'Iowa',        conf:'Big Ten',    yr:'Jr',base:1610},
+  {id:'174-4',name:'Carson Kharchla',     school:'Ohio State',  conf:'Big Ten',    yr:'Sr',base:1580},
+  {id:'174-5',name:'Daschle Lamer',       school:'Oregon State',conf:'Pac-12',     yr:'Sr',base:1555},
+  {id:'174-6',name:'Carter Baer',         school:'Binghamton',  conf:'AE',         yr:'Sr',base:1535},
+  {id:'174-7',name:'Tanner Harvey',       school:'Air Force',   conf:'MW',         yr:'Jr',base:1520},
+  {id:'174-8',name:'Luke Condon',         school:'Wisconsin',   conf:'Big Ten',    yr:'Sr',base:1510},
+  {id:'174-9',name:'Michael Blockhus',    school:'Iowa',        conf:'Big Ten',    yr:'So',base:1490},
+  {id:'174-10',name:'Ethan Ridley',       school:'Nebraska',    conf:'Big Ten',    yr:'Jr',base:1470},
+  {id:'174-11',name:'Cody Goodwin',       school:'Indiana',     conf:'Big Ten',    yr:'Sr',base:1455},
+  {id:'174-12',name:'Hayden Hinton',      school:'Maryland',    conf:'Big Ten',    yr:'Jr',base:1440},
+],matches:[
+  {w:'174-1',l:'174-2',t:'dec',sc:'2-1', ev:'2026 NCAA Finals',    dt:'2026-03-22'},
+  {w:'174-1',l:'174-3',t:'dec',sc:'5-2', ev:'2026 NCAA Semis',     dt:'2026-03-21'},
+  {w:'174-2',l:'174-4',t:'dec',sc:'4-3', ev:'2026 NCAA Semis',     dt:'2026-03-21'},
+  {w:'174-3',l:'174-4',t:'dec',sc:'2-1', ev:'2026 NCAA 3rd place', dt:'2026-03-22'},
+  {w:'174-5',l:'174-6',t:'dec',sc:'5-2', ev:'2026 NCAA 5th place', dt:'2026-03-22'},
+  {w:'174-1',l:'174-4',t:'md', sc:'9-1', ev:'2026 NCAA Quarters',  dt:'2026-03-20'},
+  {w:'174-2',l:'174-5',t:'dec',sc:'6-3', ev:'2026 NCAA Quarters',  dt:'2026-03-20'},
+  {w:'174-1',l:'174-2',t:'dec',sc:'8-6', ev:'Big Ten Championships',dt:'2026-03-08'},
+  {w:'174-3',l:'174-9',t:'dec',sc:'5-3', ev:'Iowa Duals',          dt:'2026-01-25'},
+  {w:'174-4',l:'174-7',t:'dec',sc:'7-3', ev:'Ohio State Duals',    dt:'2026-01-18'},
+]};
+
+DB[184]={wrestlers:[
+  {id:'184-1',name:'Max McEnelly',      school:'Minnesota',   conf:'Big Ten',    yr:'So',base:1720,champ:'2026 NCAA Champ'},
+  {id:'184-2',name:'Rocco Welsh',       school:'Penn State',  conf:'Big Ten',    yr:'Sr',base:1660},
+  {id:'184-3',name:'Aeoden Sinclair',   school:'Missouri',    conf:'SEC',        yr:'Sr',base:1610},
+  {id:'184-4',name:'Angelo Ferrari',   school:'Iowa',        conf:'Big Ten',    yr:'Sr',base:1595},
+  {id:'184-5',name:'Stevo Poulin',      school:'Iowa State',  conf:'Big 12',     yr:'Sr',base:1575},
+  {id:'184-6',name:'Diego Sotelo',      school:'Michigan',    conf:'Big Ten',    yr:'Jr',base:1555},
+  {id:'184-7',name:'Travis Mastrogiovanni',school:'Lehigh',   conf:'Patriot',    yr:'Sr',base:1540},
+  {id:'184-8',name:'Aaron Seidel',      school:'Virginia Tech',conf:'ACC',       yr:'So',base:1525},
+  {id:'184-9',name:'Hayden Hastings',   school:'Iowa State',  conf:'Big 12',     yr:'Jr',base:1510},
+  {id:'184-10',name:'Caleb Uhlenhopp',  school:'Utah Valley', conf:'WAC',        yr:'Sr',base:1480},
+  {id:'184-11',name:'Sam Goin',         school:'Indiana',     conf:'Big Ten',    yr:'Jr',base:1465},
+  {id:'184-12',name:'Calvin Freshour',  school:'Stanford',    conf:'Pac-12',     yr:'Jr',base:1450},
+],matches:[
+  {w:'184-1',l:'184-2',t:'dec',sc:'4-3', ev:'2026 NCAA Finals',    dt:'2026-03-22'},
+  {w:'184-1',l:'184-3',t:'dec',sc:'5-1', ev:'2026 NCAA Semis',     dt:'2026-03-21'},
+  {w:'184-2',l:'184-4',t:'dec',sc:'4-2', ev:'2026 NCAA Semis',     dt:'2026-03-21'},
+  {w:'184-4',l:'184-3',t:'dec',sc:'4-2', ev:'2026 NCAA 3rd place', dt:'2026-03-22'},
+  {w:'184-5',l:'184-6',t:'dec',sc:'10-6',ev:'2026 NCAA 5th place', dt:'2026-03-22'},
+  {w:'184-1',l:'184-5',t:'dec',sc:'6-2', ev:'2026 NCAA Quarters',  dt:'2026-03-20'},
+  {w:'184-2',l:'184-6',t:'dec',sc:'7-3', ev:'2026 NCAA Quarters',  dt:'2026-03-20'},
+  {w:'184-2',l:'184-1',t:'dec',sc:'6-4', ev:'Big Ten Championships',dt:'2026-03-07'},
+  {w:'184-5',l:'184-9',t:'dec',sc:'5-3', ev:'Big 12 Championships',dt:'2026-03-07'},
+  {w:'184-3',l:'184-6',t:'md', sc:'13-5',ev:'Missouri Duals',      dt:'2026-01-25'},
+]};
+
+DB[197]={wrestlers:[
+  {id:'197-1',name:'Josh Barr',          school:'Penn State',  conf:'Big Ten',    yr:'So',base:1720,champ:'2026 NCAA Champ'},
+  {id:'197-2',name:'Cody Merrill',        school:'OK State',    conf:'Big 12',     yr:'Jr',base:1620},
+  {id:'197-3',name:'Stephen Little',      school:'Little Rock', conf:'Sun Belt',   yr:'Sr',base:1590},
+  {id:'197-4',name:'Rocky Elam',          school:'Iowa State',  conf:'Big 12',     yr:'Sr',base:1575},
+  {id:'197-5',name:'Tanner Sloan',        school:'SD State',    conf:'Summit',     yr:'Sr',base:1560},
+  {id:'197-6',name:'Lance Leach',         school:'Illinois',    conf:'Big Ten',    yr:'Sr',base:1540},
+  {id:'197-7',name:'Silas Allred',        school:'Nebraska',    conf:'Big Ten',    yr:'Jr',base:1530},
+  {id:'197-8',name:'Jaxon Smith',         school:'Penn State',  conf:'Big Ten',    yr:'Jr',base:1515},
+  {id:'197-9',name:'Wyatt Sheets',        school:'OK State',    conf:'Big 12',     yr:'So',base:1500},
+  {id:'197-10',name:'Gavin Park',         school:'Indiana',     conf:'Big Ten',    yr:'Sr',base:1485},
+  {id:'197-11',name:'Ben Harvey',         school:'Air Force',   conf:'MW',         yr:'Sr',base:1470},
+  {id:'197-12',name:'Blake Schaffer',     school:'Kent State',  conf:'MAC',        yr:'Sr',base:1455},
+],matches:[
+  {w:'197-1',l:'197-2',t:'dec',sc:'6-3', ev:'2026 NCAA Finals',    dt:'2026-03-22'},
+  {w:'197-1',l:'197-3',t:'md', sc:'13-5',ev:'2026 NCAA Semis',     dt:'2026-03-21'},
+  {w:'197-2',l:'197-3',t:'dec',sc:'2-2', ev:'2026 NCAA Semis',     dt:'2026-03-21'},
+  {w:'197-4',l:'197-3',t:'dec',sc:'3-2', ev:'2026 NCAA 3rd place', dt:'2026-03-22'},
+  {w:'197-5',l:'197-6',t:'dec',sc:'6-2', ev:'2026 NCAA 5th place', dt:'2026-03-22'},
+  {w:'197-1',l:'197-4',t:'md', sc:'12-4',ev:'2026 NCAA Quarters',  dt:'2026-03-20'},
+  {w:'197-2',l:'197-3',t:'dec',sc:'2-2', ev:'2026 NCAA Quarters',  dt:'2026-03-20'},
+  {w:'197-1',l:'197-8',t:'tf', sc:'18-3',ev:'Big Ten Championships',dt:'2026-03-08'},
+  {w:'197-4',l:'197-9',t:'dec',sc:'8-3', ev:'Big 12 Championships',dt:'2026-03-07'},
+  {w:'197-3',l:'197-7',t:'pin',sc:'3:52',ev:'Sun Belt Championships',dt:'2026-03-02'},
+]};
+
+DB[285]={wrestlers:[
+  {id:'285-1',name:'Isaac Trumble',      school:'NC State',    conf:'ACC',        yr:'Sr',base:1720,champ:'2026 NCAA Champ'},
+  {id:'285-2',name:'Yonger Bastida',     school:'Iowa State',  conf:'Big 12',     yr:'Sr',base:1680},
+  {id:'285-3',name:'Jett Strickenberger',school:'West Virginia',conf:'Big 12',    yr:'So',base:1610},
+  {id:'285-4',name:'Ezekiel Witt',       school:'ND State',    conf:'Summit',     yr:'Jr',base:1575},
+  {id:'285-5',name:'Christian Lance',    school:'Nebraska',    conf:'Big Ten',    yr:'Sr',base:1560},
+  {id:'285-6',name:'Wyatt Hendrickson',  school:'Army',        conf:'Patriot',    yr:'Sr',base:1545},
+  {id:'285-7',name:'Derek Holschlag',    school:'Northern Iowa',conf:'MVC',       yr:'Sr',base:1530},
+  {id:'285-8',name:'Mason Parris',       school:'Michigan',    conf:'Big Ten',    yr:'Sr',base:1520},
+  {id:'285-9',name:'Greg Mayer',         school:'Army',        conf:'Patriot',    yr:'Sr',base:1505},
+  {id:'285-10',name:'Tony Cassioppi',    school:'Iowa',        conf:'Big Ten',    yr:'Sr',base:1495},
+  {id:'285-11',name:'Brandon Metz',      school:'SD State',    conf:'Summit',     yr:'Sr',base:1480},
+  {id:'285-12',name:'Emmanuel Ulrich',   school:'American',    conf:'Patriot',    yr:'Sr',base:1460},
+],matches:[
+  {w:'285-1',l:'285-2',t:'dec',sc:'5-0', ev:'2026 NCAA Finals',    dt:'2026-03-22'},
+  {w:'285-1',l:'285-3',t:'md', sc:'9-1', ev:'2026 NCAA Semis',     dt:'2026-03-21'},
+  {w:'285-2',l:'285-4',t:'md', sc:'11-3',ev:'2026 NCAA Semis',     dt:'2026-03-21'},
+  {w:'285-3',l:'285-4',t:'md', sc:'13-5',ev:'2026 NCAA 3rd place', dt:'2026-03-22'},
+  {w:'285-5',l:'285-6',t:'dec',sc:'7-2', ev:'2026 NCAA 5th place', dt:'2026-03-22'},
+  {w:'285-7',l:'285-8',t:'dec',sc:'5-3', ev:'2026 NCAA 7th place', dt:'2026-03-22'},
+  {w:'285-1',l:'285-4',t:'tf', sc:'15-0',ev:'2026 NCAA Quarters',  dt:'2026-03-20'},
+  {w:'285-2',l:'285-5',t:'dec',sc:'6-2', ev:'2026 NCAA Quarters',  dt:'2026-03-20'},
+  {w:'285-2',l:'285-3',t:'dec',sc:'7-4', ev:'Big 12 Championships',dt:'2026-03-07'},
+  {w:'285-1',l:'285-5',t:'dec',sc:'5-2', ev:'ACC Championships',   dt:'2026-03-02'},
+  {w:'285-2',l:'285-10',t:'md',sc:'14-6',ev:'Iowa State Duals',    dt:'2026-02-08'},
+]};
+
+const TEAMS=[
+  {name:'Penn State',     pts:181.5,champs:4},
+  {name:'Oklahoma State', pts:131.0,champs:3},
+  {name:'Nebraska',       pts:100.5,champs:0},
+  {name:'Iowa',           pts:95.5, champs:0},
+  {name:'Ohio State',     pts:88.0, champs:0},
+  {name:'Minnesota',      pts:84.0, champs:1},
+  {name:'NC State',       pts:76.5, champs:1},
+  {name:'Stanford',       pts:72.0, champs:1},
+  {name:'Iowa State',     pts:65.5, champs:0},
+  {name:'Virginia Tech',  pts:62.0, champs:0},
+  {name:'Michigan',       pts:58.5, champs:0},
+  {name:'Lehigh',         pts:55.0, champs:0},
+];
+
+// ═══════════════════════════════════════════════════════
+// 3. STORAGE — localStorage persistence (Opt 1)
+// ═══════════════════════════════════════════════════════
+const STORAGE_KEY = 'wrestler_os_matches_v2';
+const PENDING_KEY = 'wrestler_os_pending_v2';
+
+function loadUserMatches() {
+  try { return JSON.parse(localStorage.getItem(STORAGE_KEY)||'{}'); } catch(e){return {};}
+}
+function saveUserMatches(data) {
+  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(data)); } catch(e){}
+}
+function loadPending() {
+  try { return JSON.parse(localStorage.getItem(PENDING_KEY)||'[]'); } catch(e){return [];}
+}
+function savePending(data) {
+  try { localStorage.setItem(PENDING_KEY, JSON.stringify(data)); } catch(e){}
+}
+
+let userMatches = loadUserMatches(); // {wt: [matches...]}
+let pendingMatches = loadPending();  // [{...matchData, votes:1, submitter:'...', id:'...'}]
+
+function getAllMatches(wt) {
+  const base = DB[wt].matches;
+  const user = (userMatches[wt]||[]);
+  return [...base, ...user];
+}
+
+// ═══════════════════════════════════════════════════════
+// 4. ELO STATE
+// ═══════════════════════════════════════════════════════
+let eloState = {};
+let currentWeight = 125;
+
+function runEloForWeight(wt) {
+  const {wrestlers} = DB[wt];
+  const matches = getAllMatches(wt);
+  const ratings={}, stats={};
+  wrestlers.forEach(w=>{
+    ratings[w.id]=w.base;
+    stats[w.id]={wins:0,losses:0,pins:0,tfs:0,mds:0,decs:0,history:[],eloTimeline:[w.base]};
+  });
+  matches.forEach(m=>{
+    const rW=ratings[m.w], rL=ratings[m.l];
+    const chg=eloChg(rW,rL,m.t);
+    ratings[m.w]+=chg; ratings[m.l]-=chg;
+    stats[m.w].wins++;   stats[m.l].losses++;
+    if(m.t==='pin')stats[m.w].pins++;
+    else if(m.t==='tf')stats[m.w].tfs++;
+    else if(m.t==='md')stats[m.w].mds++;
+    else stats[m.w].decs++;
+    stats[m.w].history.push({...m,out:'win', chg:+chg,after:ratings[m.w]});
+    stats[m.l].history.push({...m,out:'loss',chg:-chg,after:ratings[m.l]});
+    stats[m.w].eloTimeline.push(ratings[m.w]);
+    stats[m.l].eloTimeline.push(ratings[m.l]);
+  });
+  return {ratings,stats};
+}
+
+function initAll(){
+  [125,133,141,149,157,165,174,184,197,285].forEach(wt=>{ eloState[wt]=runEloForWeight(wt); });
+  updatePendingBadge();
+}
+
+// ═══════════════════════════════════════════════════════
+// 5. RANKINGS RENDER
+// ═══════════════════════════════════════════════════════
+function setWeight(wt){
+  currentWeight=wt;
+  document.querySelectorAll('.wt-btn').forEach(b=>b.classList.toggle('active',parseInt(b.textContent)===wt));
+  if(document.getElementById('view-rankings').classList.contains('active'))renderRankings();
+  refreshSubSelects(); refreshH2HSelects();
+}
+
+function renderRankings(){
+  const wt=currentWeight;
+  const {ratings,stats}=eloState[wt];
+  const wrestlers=DB[wt].wrestlers;
+  document.getElementById('hero-title').innerHTML=`${wt} lbs <em>Rankings</em>`;
+  document.getElementById('rank-section-title').textContent=`${wt} lbs — algorithmic`;
+  const ranked=[...wrestlers].sort((a,b)=>ratings[b.id]-ratings[a.id]);
+  const maxR=Math.max(...ranked.map(w=>ratings[w.id]));
+  const totalM=getAllMatches(wt).length;
+  document.getElementById('hero-stats').innerHTML=`
+    <div class="stat-pill"><strong>${wrestlers.length}</strong>wrestlers</div>
+    <div class="stat-pill"><strong>${totalM}</strong>matches</div>
+    <div class="stat-pill"><strong>${Math.max(...Object.values(ratings))}</strong>top ELO</div>`;
+  document.getElementById('rankings-body').innerHTML=ranked.map((w,i)=>{
+    const r=ratings[w.id],s=stats[w.id];
+    const bar=Math.round((r/maxR)*100);
+    const delta=r-w.base;
+    const ds=delta>0?`<span class="du">+${delta}</span>`:delta<0?`<span class="dd">${delta}</span>`:`<span class="ds_">—</span>`;
+    const bon=s.wins>0?Math.round(((s.pins+s.tfs+s.mds)/s.wins)*100):0;
+    const cb=w.champ?`<span class="badge badge-champ">${w.champ}</span>`:'';
+    return `<tr class="rank-row${i<3?' gold':''}" onclick="showProfile('${w.id}',${wt})">
+      <td><div class="rank-num">${i+1}</div></td>
+      <td>
+        <div class="wrestler-name">${w.name} ${cb}</div>
+        <div class="wrestler-school">${w.school} · ${w.conf} · ${w.yr||''}</div>
+      </td>
+      <td><div class="rec"><span class="w">${s.wins}W</span>–<span class="l">${s.losses}L</span></div>
+          <div class="bonus-pct">${bon}% bonus</div></td>
+      <td><div class="wt-bar">
+        ${s.pins>0?`<span class="ws wp">${s.pins}F</span>`:''}
+        ${s.tfs>0?`<span class="ws wt_">${s.tfs}T</span>`:''}
+        ${s.mds>0?`<span class="ws wm">${s.mds}M</span>`:''}
+        ${s.decs>0?`<span class="ws wd">${s.decs}D</span>`:''}
+      </div></td>
+      <td><div class="elo-val">${r}</div>
+          <div class="elo-bar-wrap"><div class="elo-bar" style="width:${bar}%"></div></div></td>
+      <td>${ds}</td>
+    </tr>`;
+  }).join('');
+}
+
+// ═══════════════════════════════════════════════════════
+// 6. PROFILE with career ELO sparkline
+// ═══════════════════════════════════════════════════════
+function showProfile(id,wt){
+  const {ratings,stats}=eloState[wt];
+  const w=DB[wt].wrestlers.find(x=>x.id===id);
+  const r=ratings[id],s=stats[id];
+  const ranked=[...DB[wt].wrestlers].sort((a,b)=>ratings[b.id]-ratings[a.id]);
+  const rank=ranked.findIndex(x=>x.id===id)+1;
+  const bon=s.wins>0?Math.round(((s.pins+s.tfs+s.mds)/s.wins)*100):0;
+  const wr=(s.wins+s.losses)>0?Math.round((s.wins/(s.wins+s.losses))*100):0;
+  const typeMap={pin:'Fall',tf:'Tech Fall',md:'Major Dec',dec:'Decision'};
+  const typeCls={pin:'wp',tf:'wt_',md:'wm',dec:'wd'};
+  // sparkline
+  const tl=s.eloTimeline;
+  const minE=Math.min(...tl),maxE=Math.max(...tl);
+  const W=400,H=50,pad=4;
+  const pts=tl.map((v,i)=>{
+    const x=pad+(i/(Math.max(tl.length-1,1)))*(W-2*pad);
+    const y=H-pad-((v-minE)/(Math.max(maxE-minE,1)))*(H-2*pad);
+    return `${x},${y}`;
+  }).join(' ');
+  const sparkline=tl.length>1?`
+    <div class="career-section">
+      <div class="career-lbl">ELO trajectory · ${tl.length-1} matches · peak: ${Math.max(...tl)} · low: ${Math.min(...tl)}</div>
+      <svg viewBox="0 0 ${W} ${H}" class="career-chart" style="overflow:visible">
+        <polyline points="${pts}" fill="none" stroke="var(--accent)" stroke-width="1.5" stroke-linejoin="round"/>
+        <circle cx="${parseFloat(pts.split(' ').at(-1).split(',')[0])}" cy="${parseFloat(pts.split(' ').at(-1).split(',')[1])}" r="3" fill="var(--accent)"/>
+      </svg>
+    </div>`:'';
+  const cards=[...s.history].reverse().map(m=>{
+    const oppId=m.out==='win'?m.l:m.w;
+    const opp=DB[wt].wrestlers.find(x=>x.id===oppId);
+    const isPending=false;
+    return `<div class="mc${isPending?' pending-match':''}">
+      <div class="mr ${m.out==='win'?'mr-w':'mr-l'}">${m.out==='win'?'WIN':'LOSS'}</div>
+      <div>
+        <div class="m-opp">${opp?opp.name:'Unknown'}</div>
+        <div class="m-sch">${opp?opp.school:''}</div>
+        <div class="m-date">${m.dt}</div>
+      </div>
+      <div>
+        <div class="m-type-tag ws ${typeCls[m.t]}">${typeMap[m.t]}${m.sc?' · '+m.sc:''}</div>
+        <div class="m-evt">${m.ev}</div>
+      </div>
+      <div class="elo-db ${m.chg>0?'eu':'el'}">${m.chg>0?'+':''}${m.chg} → ${m.after}</div>
+    </div>`;
+  }).join('');
+  document.getElementById('profile-content').innerHTML=`
+    <div class="prof-hdr">
+      <div>
+        <div class="prof-name">${w.name}</div>
+        <div class="prof-meta">
+          <span>🏫 ${w.school}</span><span>📋 ${w.conf}</span><span>${w.yr||''} · ${wt} lbs</span>
+          ${w.champ?`<span style="color:var(--accent)">🏆 ${w.champ}</span>`:''}
+        </div>
+      </div>
+      <div class="prof-elo-card">
+        <div class="prof-elo-lbl">ELO rating</div>
+        <div class="prof-elo-num">${r}</div>
+        <div class="prof-elo-rank">#${rank} at ${wt} lbs</div>
+      </div>
+    </div>
+    <div class="stats-grid">
+      <div class="s-card"><div class="s-lbl">Record</div><div class="s-val" style="color:var(--green)">${s.wins}–${s.losses}</div></div>
+      <div class="s-card"><div class="s-lbl">Win rate</div><div class="s-val">${wr}%</div></div>
+      <div class="s-card"><div class="s-lbl">Bonus rate</div><div class="s-val" style="color:var(--accent)">${bon}%</div></div>
+      <div class="s-card"><div class="s-lbl">Falls</div><div class="s-val" style="color:var(--red)">${s.pins}</div></div>
+    </div>
+    ${sparkline}
+    <div class="mh-title" style="margin-top:12px">Match history (${s.history.length} matches)</div>
+    <div class="match-list">${cards||'<div style="color:var(--muted);font-family:var(--fm);font-size:13px;padding:10px 0">No matches recorded.</div>'}</div>`;
+  showView('profile');
+}
+
+// ═══════════════════════════════════════════════════════
+// 7. MATCHUP SIMULATOR — win probability (Opt 2)
+// ═══════════════════════════════════════════════════════
+function refreshH2HSelects(){
+  const wt=parseInt(document.getElementById('h2h-weight').value||165);
+  const opts=DB[wt].wrestlers.map(w=>`<option value="${w.id}">${w.name} (${w.school})</option>`).join('');
+  document.getElementById('h2h-a').innerHTML=opts;
+  document.getElementById('h2h-b').innerHTML=opts;
+  document.getElementById('h2h-b').selectedIndex=1;
+  runH2H();
+}
+
+function runH2H(){
+  const wt=parseInt(document.getElementById('h2h-weight').value||165);
+  const idA=document.getElementById('h2h-a').value;
+  const idB=document.getElementById('h2h-b').value;
+  if(!idA||!idB||idA===idB){
+    document.getElementById('h2h-result').innerHTML='<p style="color:var(--muted);font-family:var(--fm);font-size:13px">Select two different wrestlers.</p>';
+    return;
+  }
+  const {ratings,stats}=eloState[wt];
+  const wA=DB[wt].wrestlers.find(x=>x.id===idA);
+  const wB=DB[wt].wrestlers.find(x=>x.id===idB);
+  const rA=ratings[idA], rB=ratings[idB];
+  const probA=eloExp(rA,rB);
+  const probB=1-probA;
+  const pctA=Math.round(probA*100);
+  const pctB=100-pctA;
+  // Find H2H history
+  const allM=getAllMatches(wt);
+  const h2hMatches=allM.filter(m=>(m.w===idA&&m.l===idB)||(m.w===idB&&m.l===idA));
+  const typeMap={pin:'Fall',tf:'Tech Fall',md:'Major Dec',dec:'Decision'};
+  const h2hCards=h2hMatches.length?h2hMatches.map(m=>{
+    const aWon=m.w===idA;
+    return `<div class="h2h-past-match">
+      <span style="font-family:var(--fd);font-weight:700">${m.ev}</span>
+      <span style="color:var(--muted)">${m.dt}</span>
+      <span>${typeMap[m.t]}${m.sc?' · '+m.sc:''}</span>
+      <span class="h2h-win-tag" style="background:${aWon?'rgba(245,166,35,.15)':'rgba(59,130,246,.15)'};color:${aWon?'var(--accent)':'var(--blue)'}">
+        ${aWon?wA.name:wB.name} won
+      </span>
+    </div>`;
+  }).join(''):`<div style="color:var(--muted);font-family:var(--fm);font-size:12px;padding:8px 0">No head-to-head matches on record.</div>`;
+  const stronger=pctA>=pctB?wA:wB;
+  const weakerPct=Math.min(pctA,pctB);
+  document.getElementById('h2h-result').innerHTML=`
+    <div class="h2h-result">
+      <div style="font-family:var(--fm);font-size:12px;color:var(--muted);margin-bottom:16px">ELO-BASED WIN PROBABILITY</div>
+      <div style="display:grid;grid-template-columns:1fr auto 1fr;gap:20px;align-items:center;margin-bottom:20px">
+        <div class="h2h-card" style="border-color:${pctA>pctB?'rgba(245,166,35,.4)':'var(--border)'}">
+          <div class="h2h-wrestler-name">${wA.name}</div>
+          <div class="h2h-school">${wA.school}</div>
+          <div class="h2h-elo">ELO ${rA}</div>
+          <div class="h2h-win-pct" style="color:${pctA>pctB?'var(--accent)':'var(--blue)'}">${pctA}%</div>
+          <div class="h2h-win-label">win probability</div>
+        </div>
+        <div style="font-family:var(--fd);font-weight:900;font-size:22px;color:var(--muted)">VS</div>
+        <div class="h2h-card" style="border-color:${pctB>pctA?'rgba(245,166,35,.4)':'var(--border)'}">
+          <div class="h2h-wrestler-name">${wB.name}</div>
+          <div class="h2h-school">${wB.school}</div>
+          <div class="h2h-elo">ELO ${rB}</div>
+          <div class="h2h-win-pct" style="color:${pctB>pctA?'var(--accent)':'var(--blue)'}">${pctB}%</div>
+          <div class="h2h-win-label">win probability</div>
+        </div>
+      </div>
+      <div class="h2h-bar-wrap">
+        <div class="h2h-bar-inner">
+          <div class="h2h-bar-a" style="width:${pctA}%"></div>
+          <div class="h2h-bar-b"></div>
+        </div>
+      </div>
+      <div class="h2h-calc-note">
+        E(${wA.name}) = 1 / (1 + 10^((${rB}−${rA})/400)) = <strong style="color:var(--accent)">${(probA*100).toFixed(1)}%</strong><br>
+        ${stronger.name} is the ${pctA>=pctB?pctA:pctB}/${weakerPct} favorite based on a ${Math.abs(rA-rB)}-point ELO gap.
+      </div>
+    </div>
+    <div class="h2h-history">
+      <div class="h2h-history-title">Head-to-head history (${h2hMatches.length} match${h2hMatches.length!==1?'es':''})</div>
+      ${h2hCards}
+    </div>`;
+}
+
+// ═══════════════════════════════════════════════════════
+// 8. VERIFIED SUBMISSION (Opt 3)
+// ═══════════════════════════════════════════════════════
+function refreshSubSelects(){
+  const wt=parseInt(document.getElementById('sub-weight').value);
+  const opts=DB[wt].wrestlers.map(w=>`<option value="${w.id}">${w.name} (${w.school})</option>`).join('');
+  document.getElementById('winner-sel').innerHTML=opts;
+  document.getElementById('loser-sel').innerHTML=opts;
+  document.getElementById('loser-sel').selectedIndex=1;
+}
+
+function submitMatch(){
+  const wt=parseInt(document.getElementById('sub-weight').value);
+  const wId=document.getElementById('winner-sel').value;
+  const lId=document.getElementById('loser-sel').value;
+  const type=document.getElementById('win-type').value;
+  const score=document.getElementById('score-input').value;
+  const event=document.getElementById('event-input').value||'User submitted';
+  const date=document.getElementById('match-date').value;
+  const submitter=document.getElementById('submitter-name').value||'Anonymous';
+  if(wId===lId){alert("Winner and loser must be different.");return;}
+  const id='p'+Date.now();
+  pendingMatches.push({id,wt,w:wId,l:lId,t:type,sc:score,ev:event,dt:date,submitter,votes:1,confirmed:false});
+  savePending(pendingMatches);
+  updatePendingBadge();
+  renderPendingQueue();
+  showToast(`Result submitted — needs 1 more confirmation to go live.`);
+  showView('submit');
+}
+
+function confirmPending(id){
+  const m=pendingMatches.find(x=>x.id===id);
+  if(!m)return;
+  m.votes++;
+  if(m.votes>=2){
+    m.confirmed=true;
+    // promote to live
+    if(!userMatches[m.wt])userMatches[m.wt]=[];
+    userMatches[m.wt].push({w:m.w,l:m.l,t:m.t,sc:m.sc,ev:m.ev,dt:m.dt});
+    saveUserMatches(userMatches);
+    pendingMatches=pendingMatches.filter(x=>x.id!==id);
+    savePending(pendingMatches);
+    eloState[m.wt]=runEloForWeight(m.wt);
+    currentWeight=m.wt;
+    renderRankings();
+    showToast(`✓ Confirmed! ELO updated for ${m.wt} lbs.`);
+  } else {
+    savePending(pendingMatches);
+    showToast(`Vote recorded. 1 more confirmation needed.`);
+  }
+  updatePendingBadge();
+  renderPendingQueue();
+}
+
+function rejectPending(id){
+  pendingMatches=pendingMatches.filter(x=>x.id!==id);
+  savePending(pendingMatches);
+  updatePendingBadge();
+  renderPendingQueue();
+  showToast(`Result disputed and removed.`);
+}
+
+function updatePendingBadge(){
+  const n=pendingMatches.length;
+  const el=document.getElementById('pending-label');
+  const badge=document.getElementById('pending-count-badge');
+  if(n>0){
+    if(el)el.textContent=`${n} pending`;
+    if(badge)badge.textContent=`${n} pending`;
+  } else {
+    if(el)el.textContent=`2025–26 · Post-NCAAs`;
+    if(badge)badge.textContent='';
+  }
+}
+
+function renderPendingQueue(){
+  const el=document.getElementById('pending-list');
+  if(!el)return;
+  if(!pendingMatches.length){
+    el.innerHTML=`<div style="color:var(--muted);font-family:var(--fm);font-size:13px;padding:8px 0">No pending results. Submitted matches will appear here for community verification.</div>`;
+    return;
+  }
+  el.innerHTML=pendingMatches.map(m=>{
+    const wres=DB[m.wt]?.wrestlers;
+    const winner=wres?.find(x=>x.id===m.w);
+    const loser=wres?.find(x=>x.id===m.l);
+    const typeMap={pin:'Fall',tf:'Tech Fall',md:'Major Dec',dec:'Decision'};
+    return `<div class="pending-card">
+      <div class="pending-info">
+        <strong>${winner?winner.name:'?'} def. ${loser?loser.name:'?'}</strong><br>
+        ${typeMap[m.t]}${m.sc?' · '+m.sc:''} · ${m.wt} lbs · ${m.ev} · ${m.dt}<br>
+        Submitted by: ${m.submitter}
+      </div>
+      <div class="pending-actions">
+        <span class="votes-pill">${m.votes}/2 votes</span>
+        <button class="pend-confirm" onclick="confirmPending('${m.id}')">Confirm</button>
+        <button class="pend-reject"  onclick="rejectPending('${m.id}')">Dispute</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ═══════════════════════════════════════════════════════
+// 9. ROSTER GAP ANALYSIS (Opt 5)
+// ═══════════════════════════════════════════════════════
+const WEIGHTS=[125,133,141,149,157,165,174,184,197,285];
+
+function buildRosterInputs(){
+  const el=document.getElementById('roster-inputs');
+  el.innerHTML=WEIGHTS.map(wt=>`
+    <div class="roster-input-wrap">
+      <label>${wt} lbs</label>
+      <input type="number" id="ri-${wt}" placeholder="ELO" min="1000" max="2200" style="font-family:var(--fm)">
+    </div>`).join('');
+}
+
+function runRosterAnalysis(){
+  const gaps=WEIGHTS.map(wt=>{
+    const val=parseInt(document.getElementById(`ri-${wt}`).value)||0;
+    const {ratings}=eloState[wt];
+    const ranked=[...DB[wt].wrestlers].sort((a,b)=>ratings[b.id]-ratings[a.id]);
+    const top3avg=Math.round((ratings[ranked[0].id]+ratings[ranked[1].id]+ratings[ranked[2].id])/3);
+    const strength=val||0;
+    const gap=top3avg-strength;
+    // top recruitable wrestlers (not top-ranked = potentially available)
+    const targets=ranked.slice(2,6).map(w=>({...w,elo:ratings[w.id]}));
+    return {wt,strength,top3avg,gap,targets};
+  }).sort((a,b)=>b.gap-a.gap);
+
+  const maxGap=gaps[0].gap;
+  document.getElementById('gap-results').innerHTML=gaps.map(g=>{
+    const isWeak=g.gap>200;
+    const isStrong=g.gap<50;
+    const barColor=isWeak?'var(--red)':isStrong?'var(--green)':'var(--accent)';
+    const pct=g.strength>0?Math.round((g.strength/g.top3avg)*100):0;
+    const targPills=g.targets.map(t=>`<span class="gap-wrestler-pill" onclick="setWeight(${g.wt});showProfile('${t.id}',${g.wt})">${t.name} <span style="color:var(--muted)">${t.elo}</span></span>`).join('');
+    return `<div class="gap-row">
+      <div>
+        <div class="gap-wt ${isWeak?'weak':isStrong?'strong':''}">${g.wt}</div>
+        <div style="font-family:var(--fm);font-size:10px;color:var(--muted)">lbs</div>
+      </div>
+      <div>
+        <div class="gap-current">Your ELO: <span style="color:${g.strength>0?'var(--text)':'var(--muted)'}">${g.strength||'not set'}</span> · Top-3 avg: <span style="color:var(--accent)">${g.top3avg}</span></div>
+        <div class="strength-bar"><div class="strength-fill" style="width:${pct}%;background:${barColor}"></div></div>
+        ${g.strength>0?`<div class="gap-targets-title" style="margin-top:8px">Transfer/recruit targets</div><div>${targPills}</div>`:'<div style="font-family:var(--fm);font-size:11px;color:var(--muted);margin-top:6px">Enter your current wrestler\'s ELO to see gap analysis.</div>'}
+      </div>
+      <div>
+        <div class="gap-strength" style="color:${isWeak?'var(--red)':isStrong?'var(--green)':'var(--accent)'}">${g.strength>0?(g.gap>0?'+'+g.gap:g.gap):'-'}</div>
+        <div class="gap-strength-lbl">ELO gap</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ═══════════════════════════════════════════════════════
+// 10. TEAM RENDER
+// ═══════════════════════════════════════════════════════
+function renderTeams(){
+  const maxP=TEAMS[0].pts;
+  document.getElementById('team-body').innerHTML=TEAMS.map((t,i)=>`
+    <tr class="team-row">
+      <td style="font-family:var(--fd);font-weight:700;font-size:17px;color:${i===0?'var(--accent)':i<3?'var(--text)':'var(--muted)'}">${i+1}</td>
+      <td><div class="team-name">${t.name}</div></td>
+      <td style="text-align:right;font-family:var(--fd);font-weight:700;font-size:17px">${t.pts}</td>
+      <td style="text-align:right;font-family:var(--fd);font-weight:700;font-size:17px;color:var(--accent)">${t.champs}</td>
+      <td><div class="team-pts-bar-wrap"><div class="team-pts-bar" style="width:${Math.round((t.pts/maxP)*100)}%"></div></div></td>
+    </tr>`).join('');
+}
+
+// ═══════════════════════════════════════════════════════
+// 11. UTILS
+// ═══════════════════════════════════════════════════════
+function showView(name){
+  document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('view-'+name).classList.add('active');
+  const idx={rankings:0,h2h:1,roster:2,teams:3,submit:4,how:5,profile:-1}[name];
+  if(idx>=0)document.querySelectorAll('.nav-tab')[idx].classList.add('active');
+  if(name==='rankings')renderRankings();
+  if(name==='teams')renderTeams();
+  if(name==='submit')renderPendingQueue();
+  if(name==='h2h')refreshH2HSelects();
+}
+
+function showToast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg;
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),3000);
+}
+
+function closeModal(e){
+  if(e.target===document.getElementById('modal-overlay'))
+    document.getElementById('modal-overlay').classList.remove('open');
+}
+
+// ═══════════════════════════════════════════════════════
+// 12. INIT
+// ═══════════════════════════════════════════════════════
+initAll();
+renderRankings();
+buildRosterInputs();
+refreshSubSelects();
+document.getElementById('match-date').valueAsDate=new Date();
+</script>
+</body>
+</html>
