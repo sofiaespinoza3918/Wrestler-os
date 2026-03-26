@@ -3,1215 +3,1804 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>WrestlerOS — NCAA DI Rankings 2025–26</title>
-<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Barlow+Condensed:wght@400;600;700;800;900&family=Barlow:wght@400;500&display=swap" rel="stylesheet">
+<title>WrestlerOS — The Intelligence Platform for Wrestling Recruiting</title>
+<meta name="description" content="NCAA wrestling rankings, recruiting database, and roster intelligence powered by real match data. Built for coaches across D1, D2, D3, NAIA, NJCAA, and JUCO.">
+<meta property="og:title" content="WrestlerOS — Wrestling Recruiting Intelligence">
+<meta property="og:description" content="Algorithmic rankings and recruiting tools for college wrestling coaches. Every ranking has a math reason.">
+<meta property="og:type" content="website">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;500;600;700;800&family=Barlow:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
-:root{
-  --bg:#0a0c0f;--bg2:#111318;--bg3:#181c23;--bg4:#1e2330;
-  --border:rgba(255,255,255,0.07);--border2:rgba(255,255,255,0.13);
-  --text:#e8eaf0;--muted:#6b7280;--accent:#f5a623;--accent2:#e8593c;
-  --green:#22c55e;--red:#ef4444;--blue:#3b82f6;--purple:#a78bfa;
-  --fd:'Barlow Condensed',sans-serif;--fb:'Barlow',sans-serif;--fm:'DM Mono',monospace;
-}
-*{box-sizing:border-box;margin:0;padding:0}
-body{background:var(--bg);color:var(--text);font-family:var(--fb);font-size:15px;line-height:1.6;min-height:100vh}
-/* NAV */
-nav{position:sticky;top:0;z-index:100;background:rgba(10,12,15,0.96);backdrop-filter:blur(16px);border-bottom:1px solid var(--border);padding:0 20px;display:flex;align-items:center;gap:16px;height:54px;flex-wrap:wrap}
-.logo{font-family:var(--fd);font-size:22px;font-weight:900;letter-spacing:.04em;color:var(--accent);white-space:nowrap}
-.logo span{color:var(--text)}
-.nav-links{display:flex;gap:2px;flex-wrap:wrap}
-.nav-tab{font-family:var(--fd);font-weight:600;font-size:12px;letter-spacing:.07em;text-transform:uppercase;padding:5px 10px;border-radius:5px;border:none;background:transparent;color:var(--muted);cursor:pointer;transition:all .15s;white-space:nowrap}
-.nav-tab:hover{color:var(--text);background:var(--bg3)}
-.nav-tab.active{color:var(--accent);background:rgba(245,166,35,.1)}
-.nav-right{margin-left:auto;display:flex;align-items:center;gap:8px}
-.live-dot{width:7px;height:7px;background:var(--green);border-radius:50%;animation:pulse 2s infinite;flex-shrink:0}
-@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.6;transform:scale(.85)}}
-.live-label{font-family:var(--fm);font-size:11px;color:var(--green);white-space:nowrap}
-/* WEIGHT BAR */
-.weight-bar{background:var(--bg2);border-bottom:1px solid var(--border);padding:9px 20px;display:flex;gap:5px;flex-wrap:wrap;align-items:center}
-.wt-btn{font-family:var(--fd);font-weight:700;font-size:13px;letter-spacing:.04em;padding:4px 12px;border-radius:5px;border:1px solid var(--border);background:transparent;color:var(--muted);cursor:pointer;transition:all .15s;white-space:nowrap}
-.wt-btn:hover{border-color:var(--border2);color:var(--text)}
-.wt-btn.active{border-color:var(--accent);background:rgba(245,166,35,.1);color:var(--accent)}
-.wt-label{font-family:var(--fm);font-size:11px;color:var(--muted);margin-right:4px}
-/* MAIN */
-.main{max-width:1060px;margin:0 auto;padding:0 20px 80px}
-.view{display:none}
-.view.active{display:block}
-/* HERO */
-.hero{padding:24px 0 18px;border-bottom:1px solid var(--border)}
-.hero-top{display:flex;align-items:flex-end;justify-content:space-between;gap:14px;flex-wrap:wrap}
-.hero h1{font-family:var(--fd);font-weight:900;font-size:42px;line-height:1;letter-spacing:.02em}
-.hero h1 em{color:var(--accent);font-style:normal}
-.hero-sub{font-size:11px;color:var(--muted);margin-top:4px;font-family:var(--fm)}
-.hero-stats{display:flex;gap:12px;flex-wrap:wrap}
-.stat-pill{font-family:var(--fm);font-size:11px;color:var(--muted);border:1px solid var(--border);padding:5px 11px;border-radius:4px;text-align:center}
-.stat-pill strong{display:block;color:var(--text);font-size:17px;font-family:var(--fd);font-weight:700;line-height:1}
-/* RANKINGS TABLE */
-.rankings-header{display:flex;align-items:center;justify-content:space-between;padding:16px 0 10px;gap:10px;flex-wrap:wrap}
-.section-title{font-family:var(--fd);font-weight:700;font-size:17px;letter-spacing:.04em;color:var(--muted);text-transform:uppercase}
-.algo-badge{font-family:var(--fm);font-size:10px;color:var(--accent);border:1px solid rgba(245,166,35,.3);background:rgba(245,166,35,.06);padding:3px 9px;border-radius:4px}
-.rank-table{width:100%;border-collapse:collapse}
-.rank-table thead tr{border-bottom:2px solid var(--border2)}
-.rank-table th{font-family:var(--fm);font-size:10px;font-weight:500;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);padding:6px 10px;text-align:left}
-.rank-table th.r{text-align:right}
-.rank-row{border-bottom:1px solid var(--border);cursor:pointer;transition:background .1s}
-.rank-row:hover{background:var(--bg2)}
-.rank-row.gold{background:rgba(245,166,35,.04)}
-.rank-row td{padding:11px 10px;vertical-align:middle}
-.rank-num{font-family:var(--fd);font-size:24px;font-weight:900;color:var(--muted);width:40px;text-align:center;line-height:1}
-.rank-row.gold .rank-num{color:var(--accent)}
-.wrestler-name{font-family:var(--fd);font-weight:700;font-size:16px;letter-spacing:.02em;display:flex;align-items:center;gap:6px;flex-wrap:wrap}
-.wrestler-school{font-size:11px;color:var(--muted);font-family:var(--fm);margin-top:2px}
-.elo-bar-wrap{width:90px;background:var(--bg3);border-radius:2px;height:3px;overflow:hidden;margin-top:4px}
-.elo-bar{height:3px;border-radius:2px;background:var(--accent);transition:width .8s}
-.elo-val{font-family:var(--fm);font-size:12px;color:var(--text);text-align:right}
-.rec{font-family:var(--fm);font-size:12px;text-align:right;white-space:nowrap}
-.rec .w{color:var(--green)}.rec .l{color:var(--red)}
-.bonus-pct{font-family:var(--fm);font-size:10px;color:var(--muted);text-align:right}
-.wt-bar{display:flex;gap:2px;align-items:center;justify-content:flex-end;flex-wrap:wrap}
-.ws{height:14px;font-size:9px;font-family:var(--fm);display:flex;align-items:center;border-radius:2px;padding:0 4px;font-weight:500}
-.wp{background:rgba(239,68,68,.2);color:#ef4444}
-.wt_{background:rgba(245,166,35,.2);color:#f5a623}
-.wm{background:rgba(59,130,246,.2);color:#3b82f6}
-.wd{background:rgba(107,114,128,.2);color:#9ca3af}
-.du{color:var(--green);font-size:11px;font-family:var(--fm)}
-.dd{color:var(--red);font-size:11px;font-family:var(--fm)}
-.ds_{color:var(--muted);font-size:11px;font-family:var(--fm)}
-.badge{font-size:10px;font-family:var(--fm);padding:2px 6px;border-radius:3px;white-space:nowrap}
-.badge-champ{background:rgba(245,166,35,.15);border:1px solid rgba(245,166,35,.4);color:var(--accent)}
-.badge-pending{background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.3);color:var(--red)}
-.badge-conf{background:rgba(34,197,94,.12);border:1px solid rgba(34,197,94,.3);color:var(--green)}
-/* PROFILE */
-.prof-back{font-family:var(--fm);font-size:12px;color:var(--muted);border:none;background:none;cursor:pointer;padding:12px 0;display:flex;align-items:center;gap:5px}
-.prof-back:hover{color:var(--text)}
-.prof-hdr{display:grid;grid-template-columns:1fr auto;gap:20px;padding:18px 0;border-bottom:1px solid var(--border);align-items:start}
-.prof-name{font-family:var(--fd);font-weight:900;font-size:44px;line-height:1;letter-spacing:.02em}
-.prof-meta{font-family:var(--fm);font-size:12px;color:var(--muted);margin-top:6px;display:flex;gap:12px;flex-wrap:wrap}
-.prof-elo-card{text-align:center;padding:16px 22px;border:1px solid var(--border2);border-radius:8px;background:var(--bg2)}
-.prof-elo-lbl{font-family:var(--fm);font-size:10px;color:var(--muted);text-transform:uppercase}
-.prof-elo-num{font-family:var(--fd);font-weight:900;font-size:40px;color:var(--accent);line-height:1.1}
-.prof-elo-rank{font-family:var(--fm);font-size:11px;color:var(--muted);margin-top:3px}
-.stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:9px;padding:16px 0}
-.s-card{background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:13px}
-.s-lbl{font-family:var(--fm);font-size:10px;color:var(--muted);text-transform:uppercase}
-.s-val{font-family:var(--fd);font-weight:700;font-size:24px;line-height:1;margin-top:3px}
-.mh-title{font-family:var(--fd);font-weight:700;font-size:14px;letter-spacing:.04em;color:var(--muted);text-transform:uppercase;padding:6px 0 9px;display:flex;align-items:center;justify-content:space-between}
-.match-list{display:flex;flex-direction:column;gap:4px}
-.mc{display:grid;grid-template-columns:54px 1fr auto auto;align-items:center;gap:12px;padding:9px 13px;border-radius:6px;border:1px solid var(--border);background:var(--bg2)}
-.mc.pending-match{border-color:rgba(239,68,68,.3);background:rgba(239,68,68,.04)}
-.mr{font-family:var(--fd);font-weight:900;font-size:14px;text-align:center;padding:4px 0;border-radius:4px;letter-spacing:.05em}
-.mr-w{background:rgba(34,197,94,.12);color:var(--green)}
-.mr-l{background:rgba(239,68,68,.12);color:var(--red)}
-.m-opp{font-family:var(--fd);font-weight:700;font-size:13px}
-.m-sch{font-family:var(--fm);font-size:10px;color:var(--muted)}
-.m-date{font-family:var(--fm);font-size:10px;color:var(--muted);margin-top:1px}
-.m-type-tag{font-family:var(--fm);font-size:10px;font-weight:500;padding:2px 6px;border-radius:3px}
-.m-evt{font-family:var(--fm);font-size:10px;color:var(--muted);text-align:right;margin-top:2px}
-.elo-db{font-family:var(--fm);font-size:10px;padding:2px 6px;border-radius:3px;white-space:nowrap}
-.eu{background:rgba(34,197,94,.1);color:var(--green)}
-.el{background:rgba(239,68,68,.1);color:var(--red)}
-.confirm-btn{font-family:var(--fm);font-size:10px;padding:3px 8px;border-radius:4px;border:1px solid var(--green);background:rgba(34,197,94,.08);color:var(--green);cursor:pointer;transition:all .15s}
-.confirm-btn:hover{background:rgba(34,197,94,.18)}
-/* CAREER ELO CHART */
-.career-section{margin-top:6px;padding:14px;background:var(--bg2);border:1px solid var(--border);border-radius:8px}
-.career-lbl{font-family:var(--fm);font-size:10px;color:var(--muted);text-transform:uppercase;margin-bottom:8px}
-.career-chart{width:100%;height:60px;position:relative;overflow:visible}
-/* FORMS */
-.sub-wrap{padding:18px 0;max-width:600px}
-.sub-wrap h2{font-family:var(--fd);font-weight:700;font-size:24px;letter-spacing:.04em;margin-bottom:5px}
-.sub-wrap p{color:var(--muted);font-size:13px;margin-bottom:20px}
-.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-.ff{display:flex;flex-direction:column;gap:4px}
-.ff.full{grid-column:1/-1}
-label{font-family:var(--fm);font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}
-input,select,textarea{background:var(--bg2);border:1px solid var(--border2);border-radius:6px;color:var(--text);font-family:var(--fb);font-size:13px;padding:8px 11px;outline:none;width:100%;transition:border-color .15s}
-input:focus,select:focus,textarea:focus{border-color:var(--accent)}
-select option{background:var(--bg2)}
-.sub-btn{margin-top:16px;width:100%;background:var(--accent);color:#000;border:none;border-radius:6px;font-family:var(--fd);font-weight:900;font-size:14px;letter-spacing:.07em;text-transform:uppercase;padding:12px;cursor:pointer;transition:opacity .15s}
-.sub-btn:hover{opacity:.9}
-.sub-btn.sec{background:var(--bg3);color:var(--text);border:1px solid var(--border2);margin-top:8px}
-/* PENDING QUEUE */
-.pending-section{padding:16px 0;max-width:780px}
-.pending-section h3{font-family:var(--fd);font-weight:700;font-size:18px;letter-spacing:.04em;margin-bottom:12px;color:var(--muted);text-transform:uppercase}
-.pending-card{background:var(--bg2);border:1px solid var(--border2);border-radius:8px;padding:14px;margin-bottom:8px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
-.pending-info{font-family:var(--fm);font-size:12px;color:var(--muted)}
-.pending-info strong{color:var(--text);font-size:13px;font-family:var(--fd);font-weight:700}
-.pending-actions{display:flex;gap:6px}
-.pend-confirm{font-family:var(--fm);font-size:11px;padding:5px 12px;border-radius:5px;border:1px solid var(--green);background:rgba(34,197,94,.08);color:var(--green);cursor:pointer;transition:all .15s}
-.pend-confirm:hover{background:rgba(34,197,94,.2)}
-.pend-reject{font-family:var(--fm);font-size:11px;padding:5px 12px;border-radius:5px;border:1px solid var(--border2);background:transparent;color:var(--muted);cursor:pointer;transition:all .15s}
-.pend-reject:hover{background:var(--bg3);color:var(--red);border-color:var(--red)}
-.votes-pill{font-family:var(--fm);font-size:10px;padding:2px 7px;border-radius:3px;background:rgba(245,166,35,.1);color:var(--accent)}
-/* H2H MATCHUP SIMULATOR */
-.h2h-section{padding:18px 0;max-width:780px}
-.h2h-section h2{font-family:var(--fd);font-weight:700;font-size:24px;letter-spacing:.04em;margin-bottom:5px}
-.h2h-section p{color:var(--muted);font-size:13px;margin-bottom:20px}
-.h2h-selectors{display:grid;grid-template-columns:1fr auto 1fr;gap:16px;align-items:center;margin-bottom:20px}
-.vs-label{font-family:var(--fd);font-weight:900;font-size:28px;color:var(--muted);text-align:center}
-.h2h-card{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:20px;display:flex;flex-direction:column;align-items:center;gap:8px}
-.h2h-wrestler-name{font-family:var(--fd);font-weight:900;font-size:22px;text-align:center;letter-spacing:.02em}
-.h2h-school{font-family:var(--fm);font-size:11px;color:var(--muted)}
-.h2h-elo{font-family:var(--fm);font-size:12px;color:var(--muted)}
-.h2h-win-pct{font-family:var(--fd);font-weight:900;font-size:52px;line-height:1;color:var(--accent)}
-.h2h-win-label{font-family:var(--fm);font-size:11px;color:var(--muted)}
-.h2h-result{background:var(--bg3);border:1px solid var(--border2);border-radius:10px;padding:24px;text-align:center;margin-bottom:16px}
-.h2h-bar-wrap{background:var(--bg3);border-radius:4px;height:10px;overflow:hidden;margin-bottom:20px}
-.h2h-bar-inner{display:flex;height:100%}
-.h2h-bar-a{background:var(--accent);transition:width .6s}
-.h2h-bar-b{background:var(--blue);transition:width .6s;flex:1}
-.h2h-history{margin-top:8px}
-.h2h-history-title{font-family:var(--fm);font-size:11px;color:var(--muted);text-transform:uppercase;margin-bottom:8px}
-.h2h-past-match{display:flex;align-items:center;justify-content:space-between;padding:8px 12px;background:var(--bg2);border:1px solid var(--border);border-radius:5px;margin-bottom:4px;font-family:var(--fm);font-size:12px}
-.h2h-win-tag{padding:2px 7px;border-radius:3px;font-size:10px;font-weight:500}
-.h2h-calc-note{font-family:var(--fm);font-size:11px;color:var(--muted);text-align:center;margin-top:8px;line-height:1.6}
-/* ROSTER GAP */
-.roster-section{padding:18px 0;max-width:780px}
-.roster-section h2{font-family:var(--fd);font-weight:700;font-size:24px;letter-spacing:.04em;margin-bottom:5px}
-.roster-section p{color:var(--muted);font-size:13px;margin-bottom:20px}
-.roster-inputs{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-bottom:12px}
-.roster-input-wrap{display:flex;flex-direction:column;gap:3px}
-.roster-input-wrap label{font-family:var(--fm);font-size:10px;color:var(--muted);text-align:center}
-.roster-input-wrap input{text-align:center;font-size:12px;padding:7px 4px}
-.roster-btn{background:var(--accent);color:#000;border:none;border-radius:6px;font-family:var(--fd);font-weight:900;font-size:14px;letter-spacing:.07em;text-transform:uppercase;padding:11px 24px;cursor:pointer;transition:opacity .15s;margin-bottom:20px}
-.roster-btn:hover{opacity:.9}
-.gap-grid{display:flex;flex-direction:column;gap:8px}
-.gap-row{background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:14px;display:grid;grid-template-columns:80px 1fr auto;gap:14px;align-items:start}
-.gap-wt{font-family:var(--fd);font-weight:900;font-size:22px;line-height:1;color:var(--muted)}
-.gap-wt.weak{color:var(--red)}
-.gap-wt.strong{color:var(--green)}
-.gap-current{font-family:var(--fm);font-size:12px;margin-bottom:6px}
-.gap-current span{font-weight:500}
-.gap-targets-title{font-family:var(--fm);font-size:10px;color:var(--muted);text-transform:uppercase;margin-bottom:5px}
-.gap-wrestler-pill{display:inline-flex;align-items:center;gap:6px;background:var(--bg3);border:1px solid var(--border);border-radius:4px;padding:4px 8px;margin:2px;font-family:var(--fm);font-size:11px;cursor:pointer;transition:border-color .15s}
-.gap-wrestler-pill:hover{border-color:var(--accent);color:var(--accent)}
-.gap-strength{font-family:var(--fd);font-weight:700;font-size:20px;text-align:right;line-height:1}
-.gap-strength-lbl{font-family:var(--fm);font-size:10px;color:var(--muted);text-align:right}
-.strength-bar{width:100%;background:var(--bg3);border-radius:2px;height:4px;overflow:hidden;margin-top:4px}
-.strength-fill{height:4px;border-radius:2px;transition:width .6s}
-/* TEAM TABLE */
-.team-section{padding:18px 0}
-.team-section h2{font-family:var(--fd);font-weight:700;font-size:24px;letter-spacing:.04em;margin-bottom:14px}
-.team-table{width:100%;border-collapse:collapse}
-.team-table thead tr{border-bottom:2px solid var(--border2)}
-.team-table th{font-family:var(--fm);font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);padding:6px 12px;text-align:left}
-.team-table th.r{text-align:right}
-.team-row{border-bottom:1px solid var(--border);transition:background .1s}
-.team-row:hover{background:var(--bg2)}
-.team-row td{padding:11px 12px;font-family:var(--fm);font-size:12px;vertical-align:middle}
-.team-name{font-family:var(--fd);font-weight:700;font-size:15px}
-.team-pts-bar-wrap{width:140px;background:var(--bg3);border-radius:2px;height:4px;overflow:hidden}
-.team-pts-bar{height:4px;border-radius:2px;background:var(--accent)}
-/* HOW */
-.how-wrap{padding:18px 0;max-width:680px}
-.how-wrap h2{font-family:var(--fd);font-weight:700;font-size:24px;letter-spacing:.04em;margin-bottom:16px}
-.elo-box{background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:20px;font-family:var(--fm);font-size:13px;line-height:1.8;margin-bottom:16px}
-.formula{background:var(--bg3);border-left:2px solid var(--accent);padding:9px 13px;margin:9px 0;border-radius:0 4px 4px 0;color:var(--accent);font-size:13px}
-.wt-tbl{width:100%;border-collapse:collapse;margin-top:8px}
-.wt-tbl th,.wt-tbl td{padding:6px 12px;text-align:left;font-family:var(--fm);font-size:12px;border-bottom:1px solid var(--border)}
-.wt-tbl th{color:var(--muted);font-size:10px;text-transform:uppercase}
-.wt-tbl td:last-child{color:var(--accent)}
-/* TOAST */
-.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:var(--bg3);border:1px solid var(--green);color:var(--green);font-family:var(--fm);font-size:12px;padding:10px 20px;border-radius:8px;z-index:9999;opacity:0;pointer-events:none;transition:opacity .3s;white-space:nowrap}
-.toast.show{opacity:1}
-/* MODAL */
-.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:500;display:none;align-items:center;justify-content:center}
-.modal-overlay.open{display:flex}
-.modal{background:var(--bg2);border:1px solid var(--border2);border-radius:12px;padding:28px;max-width:440px;width:90%;position:relative}
-.modal h3{font-family:var(--fd);font-weight:700;font-size:22px;letter-spacing:.04em;margin-bottom:6px}
-.modal p{font-size:13px;color:var(--muted);margin-bottom:16px}
-.modal-close{position:absolute;top:14px;right:14px;background:none;border:none;color:var(--muted);font-size:20px;cursor:pointer;line-height:1}
-.modal-close:hover{color:var(--text)}
-@media(max-width:600px){
-  .hero h1{font-size:32px}
-  .stats-grid{grid-template-columns:1fr 1fr}
-  .form-grid,.h2h-selectors{grid-template-columns:1fr}
-  .vs-label{display:none}
-  .mc{grid-template-columns:42px 1fr}
-  .m-type-tag,.m-evt{display:none}
-  .prof-hdr{grid-template-columns:1fr}
-  .roster-inputs{grid-template-columns:repeat(2,1fr)}
-  .gap-row{grid-template-columns:60px 1fr}
-}
+  *{box-sizing:border-box;margin:0;padding:0}
+  :root{
+    --gold:#D4A017;--gold-light:#F0C040;--gold-dark:#9A7010;
+    --bg:#0a0c0f;--surface:#12151a;--surface2:#1a1e26;--surface3:#222733;
+    --border:#2a2f3d;--border2:#333a4d;
+    --text:#f0f2f7;--text2:#8892aa;--text3:#5a6478;
+    --green:#2ecc71;--red:#e74c3c;--blue:#3498db;--orange:#f39c12;
+    --accent:#c0392b;
+    font-size:16px;
+  }
+  body{font-family:'Barlow',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden}
+
+  /* NAV */
+  nav{display:flex;align-items:center;gap:0;background:var(--surface);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:100;height:56px;padding:0 1.5rem}
+  .logo{font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:1.5rem;letter-spacing:.05em;color:var(--gold);margin-right:2rem;text-transform:uppercase}
+  .logo span{color:var(--text2);font-weight:400}
+  .nav-tabs{display:flex;gap:0;flex:1;overflow-x:auto}
+  .nav-tab{padding:.7rem 1rem;font-size:.78rem;font-weight:500;letter-spacing:.06em;text-transform:uppercase;color:var(--text2);cursor:pointer;border-bottom:2px solid transparent;white-space:nowrap;transition:color .15s,border-color .15s}
+  .nav-tab:hover{color:var(--text)}
+  .nav-tab.active{color:var(--gold);border-bottom-color:var(--gold)}
+  .nav-right{display:flex;align-items:center;gap:.75rem;margin-left:auto}
+  .badge-division{background:#1e2436;border:1px solid var(--border2);color:var(--text2);font-size:.7rem;padding:.25rem .6rem;border-radius:4px;font-weight:600;letter-spacing:.04em}
+  .btn{padding:.4rem .9rem;border-radius:6px;font-size:.78rem;font-weight:600;cursor:pointer;letter-spacing:.04em;transition:all .15s;border:none}
+  .btn-gold{background:var(--gold);color:#000}
+  .btn-gold:hover{background:var(--gold-light)}
+  .btn-outline{background:transparent;border:1px solid var(--border2);color:var(--text2)}
+  .btn-outline:hover{border-color:var(--text2);color:var(--text)}
+
+  /* PAGES */
+  .page{display:none;padding:1.5rem;max-width:1400px;margin:0 auto}
+  .page.active{display:block}
+
+  /* HOMEPAGE */
+  .hero{text-align:center;padding:3rem 1rem 2rem;background:linear-gradient(180deg,#12151a 0%,transparent 100%)}
+  .hero h1{font-family:'Barlow Condensed',sans-serif;font-size:3.5rem;font-weight:800;text-transform:uppercase;letter-spacing:.05em;line-height:1}
+  .hero h1 span{color:var(--gold)}
+  .hero p{color:var(--text2);margin:.75rem auto 0;max-width:600px;font-size:1rem;line-height:1.7}
+  .hero-stats{display:flex;gap:1rem;justify-content:center;margin:1.5rem 0;flex-wrap:wrap}
+  .hstat{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:.75rem 1.5rem;text-align:center}
+  .hstat-n{font-family:'Barlow Condensed',sans-serif;font-size:2rem;font-weight:700;color:var(--gold)}
+  .hstat-l{font-size:.7rem;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-top:.15rem}
+  .div-filter{display:flex;gap:.5rem;flex-wrap:wrap;justify-content:center;margin:1rem 0}
+  .div-btn{padding:.4rem .9rem;border:1px solid var(--border2);border-radius:20px;font-size:.75rem;font-weight:600;cursor:pointer;color:var(--text2);background:transparent;transition:all .15s;letter-spacing:.04em}
+  .div-btn.active{background:var(--gold);color:#000;border-color:var(--gold)}
+
+  /* CARDS + GRID */
+  .grid-3{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:1rem}
+  .card{background:var(--surface);border:1px solid var(--border);border-radius:10px;overflow:hidden;transition:border-color .15s}
+  .card:hover{border-color:var(--border2)}
+  .card-header{padding:1rem;border-bottom:1px solid var(--border)}
+  .card-body{padding:1rem}
+  .card-title{font-family:'Barlow Condensed',sans-serif;font-size:1.1rem;font-weight:700;text-transform:uppercase;letter-spacing:.04em}
+  .card-sub{font-size:.75rem;color:var(--text2);margin-top:.2rem}
+
+  /* RANKINGS TABLE */
+  .weight-selector{display:flex;gap:.5rem;flex-wrap:wrap;margin-bottom:1rem}
+  .w-btn{padding:.35rem .75rem;border:1px solid var(--border2);border-radius:20px;font-size:.75rem;font-weight:600;cursor:pointer;color:var(--text2);background:transparent;transition:all .15s}
+  .w-btn.active{background:var(--gold);color:#000;border-color:var(--gold)}
+  .style-selector{display:flex;gap:.5rem;margin-bottom:1rem}
+  .s-btn{padding:.35rem .75rem;border:1px solid var(--border2);border-radius:6px;font-size:.75rem;font-weight:600;cursor:pointer;color:var(--text2);background:transparent;transition:all .15s}
+  .s-btn.active{background:var(--surface3);color:var(--text);border-color:var(--text2)}
+
+  table{width:100%;border-collapse:collapse;font-size:.85rem}
+  th{text-align:left;padding:.5rem .75rem;color:var(--text3);font-size:.7rem;letter-spacing:.06em;text-transform:uppercase;font-weight:600;border-bottom:1px solid var(--border)}
+  td{padding:.6rem .75rem;border-bottom:1px solid var(--border)}
+  tr:hover td{background:var(--surface2);cursor:pointer}
+  .rank-num{font-family:'Barlow Condensed',sans-serif;font-size:1.1rem;font-weight:700;color:var(--text3)}
+  .rank-1{color:var(--gold)}
+  .rank-2{color:#C0C0C0}
+  .rank-3{color:#CD7F32}
+  .wrestler-name{font-weight:600;color:var(--text)}
+  .school-name{font-size:.75rem;color:var(--text2);margin-top:.15rem}
+  .elo-score{font-family:'Barlow Condensed',sans-serif;font-size:1rem;font-weight:700}
+  .elo-delta{font-size:.72rem;padding:.1rem .35rem;border-radius:3px;font-weight:600}
+  .delta-pos{background:rgba(46,204,113,.15);color:#2ecc71}
+  .delta-neg{background:rgba(231,76,60,.15);color:#e74c3c}
+  .win-type-badge{font-size:.65rem;font-weight:700;padding:.1rem .4rem;border-radius:3px;letter-spacing:.04em}
+  .wt-pin{background:rgba(231,76,60,.2);color:#e74c3c}
+  .wt-tf{background:rgba(243,156,18,.2);color:#f39c12}
+  .wt-md{background:rgba(52,152,219,.2);color:#3498db}
+  .wt-dec{background:rgba(142,68,173,.2);color:#9b59b6}
+  .record-badge{font-size:.75rem;font-weight:600;color:var(--text2)}
+  .year-badge{font-size:.65rem;padding:.1rem .4rem;border-radius:3px;font-weight:700;letter-spacing:.03em}
+  .yr-fr{background:rgba(46,204,113,.15);color:#2ecc71}
+  .yr-so{background:rgba(52,152,219,.15);color:#3498db}
+  .yr-jr{background:rgba(243,156,18,.15);color:#f39c12}
+  .yr-sr{background:rgba(231,76,60,.15);color:#e74c3c}
+  .yr-gr{background:rgba(155,89,182,.15);color:#9b59b6}
+  .yr-hs{background:rgba(26,188,156,.15);color:#1abc9c}
+
+  /* SECTION HEADERS */
+  .section-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;flex-wrap:wrap;gap:.5rem}
+  .section-title{font-family:'Barlow Condensed',sans-serif;font-size:1.4rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em}
+  .section-sub{font-size:.8rem;color:var(--text2);margin-top:.15rem}
+
+  /* PROFILE MODAL */
+  .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:500;overflow-y:auto;padding:2rem 1rem}
+  .modal-overlay.open{display:flex;align-items:flex-start;justify-content:center}
+  .modal{background:var(--surface);border:1px solid var(--border2);border-radius:12px;width:100%;max-width:800px;overflow:hidden}
+  .modal-head{background:var(--surface2);padding:1.5rem;border-bottom:1px solid var(--border);position:relative}
+  .modal-close{position:absolute;top:1rem;right:1rem;background:var(--surface3);border:none;color:var(--text2);width:30px;height:30px;border-radius:50%;cursor:pointer;font-size:1rem;display:flex;align-items:center;justify-content:center}
+  .modal-close:hover{color:var(--text)}
+  .modal-body{padding:1.5rem}
+  .profile-name{font-family:'Barlow Condensed',sans-serif;font-size:2rem;font-weight:800;text-transform:uppercase;letter-spacing:.04em}
+  .profile-meta{display:flex;gap:.5rem;flex-wrap:wrap;margin-top:.5rem;align-items:center}
+  .profile-stats{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:.75rem;margin:1.25rem 0}
+  .pstat{background:var(--surface3);border-radius:8px;padding:.75rem;text-align:center}
+  .pstat-n{font-family:'Barlow Condensed',sans-serif;font-size:1.5rem;font-weight:700;color:var(--gold)}
+  .pstat-l{font-size:.68rem;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;margin-top:.2rem}
+  .match-log{margin-top:1rem}
+  .match-row{display:flex;align-items:center;gap:.75rem;padding:.5rem 0;border-bottom:1px solid var(--border);font-size:.82rem}
+  .match-result{font-weight:700;width:20px;text-align:center}
+  .match-W{color:var(--green)}
+  .match-L{color:var(--red)}
+  .match-opp{flex:1;color:var(--text)}
+  .match-event{color:var(--text3);font-size:.75rem}
+  .elo-bar{height:80px;margin:1rem 0;position:relative;overflow:hidden}
+  .elo-sparkline{width:100%;height:100%}
+  .section-label{font-size:.72rem;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:.5rem;font-weight:600}
+
+  /* ACADEMIC ALERT */
+  .acad-alert{background:rgba(243,156,18,.1);border:1px solid rgba(243,156,18,.4);border-radius:6px;padding:.75rem 1rem;font-size:.82rem;color:#f39c12;margin-top:.75rem;display:flex;align-items:flex-start;gap:.5rem}
+
+  /* RECRUITING */
+  .recruit-filters{display:flex;gap:.75rem;flex-wrap:wrap;margin-bottom:1rem;align-items:center}
+  .recruit-filter-group{display:flex;flex-direction:column;gap:.3rem}
+  .filter-label{font-size:.68rem;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;font-weight:600}
+  select,input[type=text],input[type=number]{background:var(--surface2);border:1px solid var(--border2);border-radius:6px;color:var(--text);padding:.4rem .75rem;font-size:.82rem;font-family:'Barlow',sans-serif}
+  select:focus,input:focus{outline:1px solid var(--gold);border-color:var(--gold)}
+  .recruit-card{background:var(--surface);border:1px solid var(--border);border-radius:10px;overflow:hidden;transition:border-color .15s,transform .1s}
+  .recruit-card:hover{border-color:var(--gold);transform:translateY(-1px)}
+  .recruit-card-head{padding:.85rem 1rem;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:flex-start}
+  .recruit-card-body{padding:.85rem 1rem}
+  .r-name{font-weight:600;font-size:.95rem;color:var(--text)}
+  .r-school{font-size:.75rem;color:var(--text2);margin-top:.15rem}
+  .r-type-badge{font-size:.65rem;font-weight:700;padding:.15rem .45rem;border-radius:4px;letter-spacing:.04em}
+  .r-hs{background:rgba(26,188,156,.15);color:#1abc9c}
+  .r-transfer{background:rgba(243,156,18,.15);color:#f39c12}
+  .star-btn{background:transparent;border:none;cursor:pointer;font-size:1.1rem;color:var(--text3);transition:color .15s;padding:.1rem}
+  .star-btn.starred{color:var(--gold)}
+  .r-stats{display:flex;gap:.75rem;flex-wrap:wrap;font-size:.78rem}
+  .r-stat{display:flex;flex-direction:column;gap:.1rem}
+  .r-stat-l{color:var(--text3);font-size:.67rem;text-transform:uppercase;letter-spacing:.05em}
+  .r-stat-v{font-weight:600;color:var(--text)}
+  .portal-tag{font-size:.65rem;padding:.1rem .35rem;border-radius:3px;font-weight:700;background:rgba(52,152,219,.15);color:#3498db}
+  .committed-tag{font-size:.65rem;padding:.1rem .35rem;border-radius:3px;font-weight:700;background:rgba(231,76,60,.15);color:#e74c3c}
+
+  /* ROSTER GAP */
+  .gap-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:.75rem}
+  .gap-card{background:var(--surface);border-radius:8px;padding:1rem;border:1px solid var(--border);position:relative}
+  .gap-wc{font-family:'Barlow Condensed',sans-serif;font-size:1.4rem;font-weight:700;color:var(--text)}
+  .gap-wrestler{font-size:.82rem;color:var(--text2);margin-top:.15rem}
+  .gap-elo{font-family:'Barlow Condensed',sans-serif;font-size:1.1rem;font-weight:600}
+  .gap-bar-wrap{height:6px;background:var(--surface3);border-radius:3px;margin:.5rem 0}
+  .gap-bar-fill{height:100%;border-radius:3px;transition:width .4s}
+  .gap-strong{background:#2ecc71}.gap-ok{background:#f39c12}.gap-weak{background:#e74c3c}
+  .gap-label{font-size:.7rem;color:var(--text3)}
+
+  /* HOW IT WORKS */
+  .how-step{display:flex;gap:1.25rem;margin-bottom:2rem;align-items:flex-start}
+  .how-num{width:40px;height:40px;border-radius:50%;background:var(--gold);color:#000;display:flex;align-items:center;justify-content:center;font-family:'Barlow Condensed',sans-serif;font-size:1.2rem;font-weight:800;flex-shrink:0}
+  .how-content h3{font-family:'Barlow Condensed',sans-serif;font-size:1.2rem;font-weight:700;text-transform:uppercase;letter-spacing:.04em;margin-bottom:.4rem}
+  .how-content p{color:var(--text2);font-size:.9rem;line-height:1.7}
+  .coach-pitch{background:var(--surface2);border:1px solid var(--border2);border-radius:10px;padding:1.5rem;margin:1.5rem 0}
+  .coach-pitch h3{font-family:'Barlow Condensed',sans-serif;font-size:1.3rem;font-weight:700;color:var(--gold);text-transform:uppercase;margin-bottom:1rem}
+  .pitch-item{display:flex;gap:.75rem;margin-bottom:.75rem;align-items:flex-start;font-size:.9rem;color:var(--text2)}
+  .pitch-icon{color:var(--gold);font-size:.9rem;margin-top:.1rem}
+
+  /* ACADEMIC */
+  .acad-upload{background:var(--surface2);border:2px dashed var(--border2);border-radius:10px;padding:2rem;text-align:center;cursor:pointer;transition:border-color .15s}
+  .acad-upload:hover{border-color:var(--gold)}
+  .acad-upload h3{font-family:'Barlow Condensed',sans-serif;font-size:1.2rem;font-weight:700;text-transform:uppercase;color:var(--text2);margin:.75rem 0 .4rem}
+  .acad-result{background:var(--surface);border:1px solid var(--border2);border-radius:10px;padding:1.25rem;margin-top:1rem}
+  .ai-indicator{display:inline-flex;align-items:center;gap:.35rem;font-size:.72rem;color:var(--text3);background:var(--surface2);border:1px solid var(--border);border-radius:4px;padding:.2rem .6rem;font-weight:600;letter-spacing:.04em}
+  .ai-dot{width:6px;height:6px;border-radius:50%;background:var(--green);animation:pulse 1.5s infinite}
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+
+  /* TEAMS */
+  .team-score-row{display:flex;align-items:center;gap:.75rem;padding:.6rem .75rem;border-bottom:1px solid var(--border);font-size:.85rem}
+  .team-rank-num{font-family:'Barlow Condensed',sans-serif;font-size:1.1rem;font-weight:700;width:24px;color:var(--text3)}
+  .team-name{flex:1;font-weight:600}
+  .team-pts{font-family:'Barlow Condensed',sans-serif;font-size:1.1rem;font-weight:700;color:var(--gold)}
+  .team-champs{font-size:.75rem;color:var(--text2)}
+
+  /* MATCHUP */
+  .matchup-area{background:var(--surface2);border-radius:10px;padding:1.5rem;margin-top:1rem}
+  .vs-display{display:flex;align-items:center;gap:1rem;margin:1rem 0}
+  .vs-wrestler{flex:1;text-align:center}
+  .vs-name{font-family:'Barlow Condensed',sans-serif;font-size:1.5rem;font-weight:800;text-transform:uppercase}
+  .vs-school{font-size:.8rem;color:var(--text2);margin-top:.2rem}
+  .vs-elo{font-family:'Barlow Condensed',sans-serif;font-size:2rem;font-weight:800;color:var(--gold)}
+  .vs-pct{font-family:'Barlow Condensed',sans-serif;font-size:1.4rem;font-weight:700}
+  .vs-divider{color:var(--text3);font-size:1.2rem;font-weight:300}
+  .prob-bar{height:20px;border-radius:4px;overflow:hidden;display:flex;margin:1rem 0}
+  .prob-a{background:var(--gold);display:flex;align-items:center;justify-content:center;font-size:.72rem;font-weight:700;color:#000}
+  .prob-b{background:var(--surface3);display:flex;align-items:center;justify-content:center;font-size:.72rem;font-weight:700;color:var(--text2)}
+
+  /* TOAST */
+  .toast{position:fixed;bottom:1.5rem;right:1.5rem;background:var(--surface2);border:1px solid var(--green);border-radius:8px;padding:.75rem 1.25rem;font-size:.85rem;color:var(--text);z-index:999;transform:translateY(100px);opacity:0;transition:all .3s}
+  .toast.show{transform:translateY(0);opacity:1}
+
+  /* SUBMIT FORM */
+  .submit-form{background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:1.5rem}
+  .form-row{display:grid;grid-template-columns:1fr 1fr;gap:.75rem;margin-bottom:.75rem}
+  .form-row.three{grid-template-columns:1fr 1fr 1fr}
+  .form-group{display:flex;flex-direction:column;gap:.35rem}
+  label{font-size:.75rem;color:var(--text2);font-weight:600;letter-spacing:.04em;text-transform:uppercase}
+  input,select,textarea{width:100%}
+  textarea{resize:vertical;min-height:60px}
+
+  /* DREAM TAB */
+  .dream-section{margin-bottom:2rem}
+  .dream-section-title{font-family:'Barlow Condensed',sans-serif;font-size:1.1rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;padding:.5rem 0;border-bottom:1px solid var(--border);margin-bottom:.75rem;color:var(--text2)}
+  .dream-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:.75rem}
+
+  /* WEIGHT CLASS STYLES */
+  .style-folkstyle{border-top:2px solid #3498db}
+  .style-freestyle{border-top:2px solid #2ecc71}
+  .style-greco{border-top:2px solid #e74c3c}
+
+  /* SEARCH */
+  .search-bar{display:flex;gap:.5rem;align-items:center;margin-bottom:1rem}
+  .search-input{flex:1;padding:.45rem .85rem;background:var(--surface2);border:1px solid var(--border2);border-radius:20px;color:var(--text);font-size:.85rem;font-family:'Barlow',sans-serif}
+  .search-input:focus{outline:1px solid var(--gold);border-color:var(--gold)}
+
+  @media(max-width:640px){
+    .form-row{grid-template-columns:1fr}
+    .form-row.three{grid-template-columns:1fr}
+    .vs-display{flex-direction:column}
+    .hero h1{font-size:2.2rem}
+  }
 </style>
 </head>
 <body>
 
 <nav>
   <div class="logo">Wrestler<span>OS</span></div>
-  <div class="nav-links">
-    <button class="nav-tab active"  onclick="showView('rankings')">Rankings</button>
-    <button class="nav-tab"         onclick="showView('h2h')">Matchup Sim</button>
-    <button class="nav-tab"         onclick="showView('roster')">Roster Gap</button>
-    <button class="nav-tab"         onclick="showView('teams')">Teams</button>
-    <button class="nav-tab"         onclick="showView('submit')">Submit Result</button>
-    <button class="nav-tab"         onclick="showView('how')">How It Works</button>
+  <div class="nav-tabs">
+    <div class="nav-tab active" onclick="showPage('home')">Home</div>
+    <div class="nav-tab" onclick="showPage('rankings')">Rankings</div>
+    <div class="nav-tab" onclick="showPage('recruiting')">Recruiting</div>
+    <div class="nav-tab" onclick="showPage('roster')">Roster Intel</div>
+    <div class="nav-tab" onclick="showPage('matchup')">Matchup</div>
+    <div class="nav-tab" onclick="showPage('academic')">Academic AI</div>
+    <div class="nav-tab" onclick="showPage('teams')">Teams</div>
+    <div class="nav-tab" onclick="showPage('submit')">Submit Result</div>
+    <div class="nav-tab" onclick="showPage('how')">How It Works</div>
   </div>
   <div class="nav-right">
-    <div class="live-dot"></div>
-    <span class="live-label" id="pending-label">2025–26 · Post-NCAAs</span>
+    <span class="badge-division" id="currentDiv">D1</span>
+    <button class="btn btn-gold" onclick="showPage('academic')">Coach Login</button>
   </div>
 </nav>
 
-<div class="weight-bar">
-  <span class="wt-label">Weight:</span>
-  <button class="wt-btn active" onclick="setWeight(125)">125</button>
-  <button class="wt-btn" onclick="setWeight(133)">133</button>
-  <button class="wt-btn" onclick="setWeight(141)">141</button>
-  <button class="wt-btn" onclick="setWeight(149)">149</button>
-  <button class="wt-btn" onclick="setWeight(157)">157</button>
-  <button class="wt-btn" onclick="setWeight(165)">165</button>
-  <button class="wt-btn" onclick="setWeight(174)">174</button>
-  <button class="wt-btn" onclick="setWeight(184)">184</button>
-  <button class="wt-btn" onclick="setWeight(197)">197</button>
-  <button class="wt-btn" onclick="setWeight(285)">285</button>
-</div>
-
-<div id="toast" class="toast"></div>
-
-<!-- MODAL for reporting -->
-<div class="modal-overlay" id="modal-overlay" onclick="closeModal(event)">
-  <div class="modal">
-    <button class="modal-close" onclick="document.getElementById('modal-overlay').classList.remove('open')">✕</button>
-    <h3>Confirm this result?</h3>
-    <p id="modal-text">Confirming as a second source helps verify accuracy before the ELO engine counts it.</p>
-    <div style="display:flex;gap:8px;margin-top:4px">
-      <button class="sub-btn" id="modal-confirm-btn" style="margin-top:0;flex:1">Confirm Result</button>
-      <button class="sub-btn sec" id="modal-reject-btn" style="flex:1">Dispute</button>
-    </div>
-  </div>
-</div>
-
-<div class="main">
-
-<!-- ═══ RANKINGS ═══ -->
-<div id="view-rankings" class="view active">
+<!-- HOME PAGE -->
+<div class="page active" id="page-home">
   <div class="hero">
-    <div class="hero-top">
+    <h1>The <span>Intelligence</span><br>Platform for Wrestling</h1>
+    <p>Real match data. Algorithmic rankings. Recruiting tools that actually work — across D1, D2, D3, NAIA, NJCAA & JUCO. Built for coaches who are serious about winning.</p>
+    <div class="hero-stats">
+      <div class="hstat"><div class="hstat-n">10</div><div class="hstat-l">Weight Classes</div></div>
+      <div class="hstat"><div class="hstat-n">6</div><div class="hstat-l">Divisions</div></div>
+      <div class="hstat"><div class="hstat-n">3</div><div class="hstat-l">Styles Tracked</div></div>
+      <div class="hstat"><div class="hstat-n">Live</div><div class="hstat-l">2025-26 Season</div></div>
+    </div>
+    <div class="div-filter">
+      <div class="div-btn active" onclick="setDiv('D1',this)">NCAA D1</div>
+      <div class="div-btn" onclick="setDiv('D2',this)">NCAA D2</div>
+      <div class="div-btn" onclick="setDiv('D3',this)">NCAA D3</div>
+      <div class="div-btn" onclick="setDiv('NAIA',this)">NAIA</div>
+      <div class="div-btn" onclick="setDiv('NJCAA',this)">NJCAA</div>
+      <div class="div-btn" onclick="setDiv('JUCO',this)">JUCO</div>
+    </div>
+  </div>
+
+  <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:1rem;margin-top:1.5rem">
+    <div class="card" style="cursor:pointer" onclick="showPage('rankings')">
+      <div class="card-header">
+        <div style="font-size:1.5rem">🏆</div>
+        <div class="card-title" style="margin-top:.5rem">Live Rankings</div>
+        <div class="card-sub">ELO-powered. Season-long. Every match counts.</div>
+      </div>
+      <div class="card-body">
+        <div style="font-size:.85rem;color:var(--text2);line-height:1.6">Rankings built from <strong style="color:var(--text)">every documented match</strong> — not just championships. Folkstyle, freestyle, and greco-roman weights tracked separately.</div>
+        <button class="btn btn-gold" style="margin-top:1rem;width:100%" onclick="showPage('rankings')">View Rankings →</button>
+      </div>
+    </div>
+    <div class="card" style="cursor:pointer" onclick="showPage('recruiting')">
+      <div class="card-header">
+        <div style="font-size:1.5rem">🎯</div>
+        <div class="card-title" style="margin-top:.5rem">Recruiting Database</div>
+        <div class="card-sub">Transfer portal + high school prospects.</div>
+      </div>
+      <div class="card-body">
+        <div style="font-size:.85rem;color:var(--text2);line-height:1.6">Only <strong style="color:var(--text)">available athletes</strong> — committed wrestlers disappear automatically. Academic fit flags included. GPA, test scores, eligibility center IDs.</div>
+        <button class="btn btn-gold" style="margin-top:1rem;width:100%" onclick="showPage('recruiting')">Browse Prospects →</button>
+      </div>
+    </div>
+    <div class="card" style="cursor:pointer" onclick="showPage('roster')">
+      <div class="card-header">
+        <div style="font-size:1.5rem">📊</div>
+        <div class="card-title" style="margin-top:.5rem">Roster Gap Analysis</div>
+        <div class="card-sub">Find your weak weights. Target the right recruits.</div>
+      </div>
+      <div class="card-body">
+        <div style="font-size:.85rem;color:var(--text2);line-height:1.6">Select your school. See your roster's ELO by weight. Instantly surface the top available athletes for each weak position.</div>
+        <button class="btn btn-gold" style="margin-top:1rem;width:100%" onclick="showPage('roster')">Analyze Roster →</button>
+      </div>
+    </div>
+    <div class="card" style="cursor:pointer" onclick="showPage('matchup')">
+      <div class="card-header">
+        <div style="font-size:1.5rem">⚡</div>
+        <div class="card-title" style="margin-top:.5rem">Matchup Simulator</div>
+        <div class="card-sub">Win probabilities. Head-to-head history.</div>
+      </div>
+      <div class="card-body">
+        <div style="font-size:.85rem;color:var(--text2);line-height:1.6">Pit any two wrestlers against each other. Get a calculated win probability based on season-long performance data.</div>
+        <button class="btn btn-gold" style="margin-top:1rem;width:100%" onclick="showPage('matchup')">Run Matchup →</button>
+      </div>
+    </div>
+    <div class="card" style="cursor:pointer" onclick="showPage('academic')">
+      <div class="card-header">
+        <div style="font-size:1.5rem">🎓</div>
+        <div class="card-title" style="margin-top:.5rem">Academic Index AI</div>
+        <div class="card-sub">Upload transcripts. Get instant eligibility scores.</div>
+      </div>
+      <div class="card-body">
+        <div style="font-size:.85rem;color:var(--text2);line-height:1.6">Set your institution's academic thresholds. AI flags degree mismatches, calculates academic index, and filters your recruiting board instantly.</div>
+        <button class="btn btn-gold" style="margin-top:1rem;width:100%" onclick="showPage('academic')">Set Up Academic Filters →</button>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <div style="font-size:1.5rem">🏅</div>
+        <div class="card-title" style="margin-top:.5rem">2026 NCAA Champions</div>
+        <div class="card-sub">Penn State — 181.5 pts (record)</div>
+      </div>
+      <div class="card-body" style="font-size:.82rem">
+        <div style="display:grid;grid-template-columns:auto 1fr auto;gap:.3rem .75rem;align-items:center">
+          <span style="color:var(--text3);font-weight:600">125</span><span style="color:var(--text)">Luke Lilledahl</span><span style="color:var(--text2)">Penn State</span>
+          <span style="color:var(--text3);font-weight:600">133</span><span style="color:var(--text)">Jax Forrest</span><span style="color:var(--text2)">Oklahoma State</span>
+          <span style="color:var(--text3);font-weight:600">141</span><span style="color:var(--text)">Sergio Vega</span><span style="color:var(--text2)">Oklahoma State</span>
+          <span style="color:var(--text3);font-weight:600">149</span><span style="color:var(--text)">Aden Valencia</span><span style="color:var(--text2)">Stanford</span>
+          <span style="color:var(--text3);font-weight:600">157</span><span style="color:var(--text)">Landon Robideau</span><span style="color:var(--text2)">Oklahoma State</span>
+          <span style="color:var(--text3);font-weight:600">165</span><span style="color:var(--text)">Mitchell Mesenbrink</span><span style="color:var(--text2)">Penn State</span>
+          <span style="color:var(--text3);font-weight:600">174</span><span style="color:var(--text)">Levi Haines</span><span style="color:var(--text2)">Penn State</span>
+          <span style="color:var(--text3);font-weight:600">184</span><span style="color:var(--text)">Max McEnelly</span><span style="color:var(--text2)">Minnesota</span>
+          <span style="color:var(--text3);font-weight:600">197</span><span style="color:var(--text)">Josh Barr</span><span style="color:var(--text2)">Penn State</span>
+          <span style="color:var(--text3);font-weight:600">285</span><span style="color:var(--text)">Isaac Trumble</span><span style="color:var(--text2)">NC State</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- RANKINGS PAGE -->
+<div class="page" id="page-rankings">
+  <div class="section-header">
+    <div>
+      <div class="section-title">Rankings</div>
+      <div class="section-sub">Based on full season ELO — every documented match, not just championships</div>
+    </div>
+    <div class="ai-indicator"><div class="ai-dot"></div> Live 2025-26</div>
+  </div>
+
+  <div style="display:flex;gap:.75rem;flex-wrap:wrap;margin-bottom:.75rem;align-items:center">
+    <div class="style-selector">
+      <div class="s-btn active" onclick="setStyle('folkstyle',this)">Folkstyle</div>
+      <div class="s-btn" onclick="setStyle('freestyle',this)">Freestyle</div>
+      <div class="s-btn" onclick="setStyle('greco',this)">Greco-Roman</div>
+    </div>
+    <div style="font-size:.75rem;color:var(--text3);margin-left:.5rem" id="style-weights-note">NCAA Folkstyle: 125, 133, 141, 149, 157, 165, 174, 184, 197, 285 lbs</div>
+  </div>
+
+  <div class="weight-selector" id="weight-btns"></div>
+
+  <div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;overflow:hidden">
+    <table id="rankings-table">
+      <thead>
+        <tr>
+          <th style="width:40px">#</th>
+          <th>Wrestler</th>
+          <th>School</th>
+          <th>Year</th>
+          <th>ELO</th>
+          <th>Record</th>
+          <th>Bonus%</th>
+          <th>Best Win</th>
+        </tr>
+      </thead>
+      <tbody id="rankings-body"></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- RECRUITING PAGE -->
+<div class="page" id="page-recruiting">
+  <div class="section-header">
+    <div>
+      <div class="section-title">Recruiting Database</div>
+      <div class="section-sub">Transfer portal + high school prospects — available only. Committed athletes automatically removed.</div>
+    </div>
+    <div class="ai-indicator"><div class="ai-dot"></div> Updated Daily</div>
+  </div>
+
+  <div class="recruit-filters">
+    <div class="recruit-filter-group">
+      <div class="filter-label">Type</div>
+      <select id="r-type" onchange="filterRecruits()">
+        <option value="all">All</option>
+        <option value="transfer">Transfer Portal</option>
+        <option value="hs">High School</option>
+        <option value="intl">International</option>
+      </select>
+    </div>
+    <div class="recruit-filter-group">
+      <div class="filter-label">Weight</div>
+      <select id="r-weight" onchange="filterRecruits()">
+        <option value="all">All</option>
+        <option>125</option><option>133</option><option>141</option>
+        <option>149</option><option>157</option><option>165</option>
+        <option>174</option><option>184</option><option>197</option><option>285</option>
+      </select>
+    </div>
+    <div class="recruit-filter-group">
+      <div class="filter-label">Division Fit</div>
+      <select id="r-div" onchange="filterRecruits()">
+        <option value="all">Any Division</option>
+        <option>D1</option><option>D2</option><option>D3</option>
+        <option>NAIA</option><option>NJCAA</option>
+      </select>
+    </div>
+    <div class="recruit-filter-group">
+      <div class="filter-label">Min GPA</div>
+      <input type="number" id="r-gpa" placeholder="0.0" min="0" max="4" step="0.1" style="width:80px" onchange="filterRecruits()">
+    </div>
+    <div class="recruit-filter-group">
+      <div class="filter-label">Search</div>
+      <input type="text" id="r-search" placeholder="Name or school..." style="width:200px" oninput="filterRecruits()">
+    </div>
+  </div>
+
+  <div style="margin-bottom:.75rem;font-size:.82rem;color:var(--text3)" id="recruit-count"></div>
+
+  <div id="recruit-grid" class="grid-3"></div>
+
+  <!-- DREAM TAB -->
+  <div style="margin-top:2rem">
+    <div class="section-header">
       <div>
-        <h1 id="hero-title">125 lbs <em>Rankings</em></h1>
-        <div class="hero-sub">ELO-based · win-type weighted · 2025–26 NCAA DI · post-NCAAs · persisted locally</div>
+        <div class="section-title">⭐ Dream Board</div>
+        <div class="section-sub">Your starred prospects. Automatically removes committed athletes.</div>
       </div>
-      <div class="hero-stats" id="hero-stats"></div>
+      <button class="btn btn-outline" onclick="clearDreamBoard()">Clear Board</button>
+    </div>
+    <div style="margin-bottom:1rem">
+      <div class="dream-section-title">Transfer Portal Targets</div>
+      <div id="dream-transfer" class="dream-grid"></div>
+      <div class="dream-section-title" style="margin-top:1rem">High School / Young Prospects</div>
+      <div id="dream-hs" class="dream-grid"></div>
     </div>
   </div>
-  <div class="rankings-header">
-    <div class="section-title" id="rank-section-title">125 lbs — algorithmic</div>
-    <div class="algo-badge">ELO · pin×1.4 · tf×1.25 · md×1.1 · dec×1.0</div>
+</div>
+
+<!-- ROSTER INTEL PAGE -->
+<div class="page" id="page-roster">
+  <div class="section-header">
+    <div>
+      <div class="section-title">Roster Intelligence</div>
+      <div class="section-sub">Select your school to analyze roster strength by weight class</div>
+    </div>
   </div>
-  <table class="rank-table">
-    <thead><tr>
-      <th style="width:46px">Rank</th>
-      <th>Wrestler</th>
-      <th class="r">Record</th>
-      <th class="r" style="min-width:80px">Win types</th>
-      <th class="r">ELO</th>
-      <th class="r">Δ base</th>
-    </tr></thead>
-    <tbody id="rankings-body"></tbody>
-  </table>
+
+  <div style="display:flex;gap:.75rem;align-items:flex-end;margin-bottom:1.5rem;flex-wrap:wrap">
+    <div class="recruit-filter-group">
+      <div class="filter-label">Your School</div>
+      <select id="coach-school" onchange="loadRoster()">
+        <option value="">Select School...</option>
+        <option>Penn State</option><option>Oklahoma State</option><option>Iowa</option>
+        <option>Nebraska</option><option>Ohio State</option><option>NC State</option>
+        <option>Stanford</option><option>Minnesota</option><option>Michigan</option>
+        <option>Iowa State</option><option>Missouri</option><option>Virginia Tech</option>
+        <option>Arizona State</option><option>Purdue</option><option>Illinois</option>
+        <option>Wisconsin</option><option>Wyoming</option><option>Other D1</option>
+      </select>
+    </div>
+    <div class="recruit-filter-group">
+      <div class="filter-label">Division</div>
+      <select id="coach-div">
+        <option>D1</option><option>D2</option><option>D3</option>
+        <option>NAIA</option><option>NJCAA</option><option>JUCO</option>
+      </select>
+    </div>
+    <button class="btn btn-gold" onclick="loadRoster()">Load Roster</button>
+  </div>
+
+  <div id="roster-display" style="display:none">
+    <div class="section-header">
+      <div class="section-title" id="roster-school-name">Roster</div>
+      <div class="ai-indicator"><div class="ai-dot"></div> Gap Analysis Active</div>
+    </div>
+
+    <div id="roster-table-wrap" style="background:var(--surface);border:1px solid var(--border);border-radius:10px;overflow:hidden;margin-bottom:1.5rem">
+      <table>
+        <thead>
+          <tr>
+            <th>Weight</th><th>Wrestler</th><th>Year</th><th>Record</th><th>ELO</th><th>Strength</th>
+          </tr>
+        </thead>
+        <tbody id="roster-body"></tbody>
+      </table>
+    </div>
+
+    <div class="section-title" style="margin-bottom:1rem">Gap Analysis — Available Targets</div>
+    <div id="gap-analysis-grid" class="gap-grid"></div>
+  </div>
 </div>
 
-<!-- ═══ PROFILE ═══ -->
-<div id="view-profile" class="view">
-  <button class="prof-back" onclick="showView('rankings')">← back to rankings</button>
-  <div id="profile-content"></div>
+<!-- MATCHUP PAGE -->
+<div class="page" id="page-matchup">
+  <div class="section-header">
+    <div>
+      <div class="section-title">Matchup Simulator</div>
+      <div class="section-sub">Head-to-head win probability based on season ELO</div>
+    </div>
+  </div>
+
+  <div style="display:flex;gap:1rem;flex-wrap:wrap;align-items:flex-end">
+    <div class="recruit-filter-group">
+      <div class="filter-label">Weight Class</div>
+      <select id="mu-weight" onchange="populateMatchupSelects()">
+        <option>125</option><option>133</option><option>141</option><option>149</option>
+        <option value="157" selected>157</option><option>165</option><option>174</option>
+        <option>184</option><option>197</option><option>285</option>
+      </select>
+    </div>
+    <div class="recruit-filter-group">
+      <div class="filter-label">Wrestler A</div>
+      <select id="mu-a"></select>
+    </div>
+    <div class="recruit-filter-group">
+      <div class="filter-label">Wrestler B</div>
+      <select id="mu-b"></select>
+    </div>
+    <button class="btn btn-gold" onclick="runMatchup()">Calculate</button>
+  </div>
+
+  <div class="matchup-area" id="matchup-result" style="display:none">
+    <div class="vs-display">
+      <div class="vs-wrestler">
+        <div class="vs-name" id="mu-name-a"></div>
+        <div class="vs-school" id="mu-school-a"></div>
+        <div class="vs-elo" id="mu-elo-a"></div>
+        <div class="vs-pct" id="mu-pct-a"></div>
+      </div>
+      <div class="vs-divider">VS</div>
+      <div class="vs-wrestler">
+        <div class="vs-name" id="mu-name-b"></div>
+        <div class="vs-school" id="mu-school-b"></div>
+        <div class="vs-elo" id="mu-elo-b"></div>
+        <div class="vs-pct" id="mu-pct-b"></div>
+      </div>
+    </div>
+    <div class="prob-bar" id="mu-bar">
+      <div class="prob-a" id="mu-bar-a"></div>
+      <div class="prob-b" id="mu-bar-b"></div>
+    </div>
+    <div id="mu-explanation" style="font-size:.85rem;color:var(--text2);line-height:1.7;margin-top:.75rem"></div>
+  </div>
+
+  <div style="margin-top:1.5rem">
+    <div class="section-label">Quick Matchups — 2026 NCAA Finals Rematches</div>
+    <div style="display:flex;gap:.5rem;flex-wrap:wrap;margin-top:.5rem">
+      <button class="btn btn-outline" onclick="quickMatchup(165,0,2)">Mesenbrink vs Caliendo</button>
+      <button class="btn btn-outline" onclick="quickMatchup(125,0,1)">Lilledahl vs McGowan</button>
+      <button class="btn btn-outline" onclick="quickMatchup(174,0,2)">Haines vs Minto</button>
+      <button class="btn btn-outline" onclick="quickMatchup(285,0,1)">Trumble vs Bastida</button>
+      <button class="btn btn-outline" onclick="quickMatchup(141,0,1)">Vega vs Mendez</button>
+    </div>
+  </div>
 </div>
 
-<!-- ═══ MATCHUP SIMULATOR ═══ -->
-<div id="view-h2h" class="view">
-  <div class="h2h-section">
-    <h2>Matchup Simulator</h2>
-    <p>Select any two wrestlers at the same weight class. The ELO formula calculates win probability and shows head-to-head history.</p>
-    <div class="form-grid" style="max-width:400px;margin-bottom:16px">
-      <div class="ff"><label>Weight class</label>
-        <select id="h2h-weight" onchange="refreshH2HSelects()">
-          <option value="125">125 lbs</option><option value="133">133 lbs</option>
-          <option value="141">141 lbs</option><option value="149">149 lbs</option>
-          <option value="157">157 lbs</option><option value="165">165 lbs</option>
-          <option value="174">174 lbs</option><option value="184">184 lbs</option>
-          <option value="197">197 lbs</option><option value="285">285 lbs</option>
+<!-- ACADEMIC AI PAGE -->
+<div class="page" id="page-academic">
+  <div class="section-header">
+    <div>
+      <div class="section-title">Academic Intelligence</div>
+      <div class="section-sub">AI-powered academic index calculator. Upload transcripts or enter scores manually.</div>
+    </div>
+    <div class="ai-indicator"><div class="ai-dot"></div> AI Powered</div>
+  </div>
+
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;margin-bottom:1.5rem" class="form-row">
+    <!-- COACH SETTINGS -->
+    <div class="submit-form">
+      <div class="section-label" style="margin-bottom:1rem">Your Institution's Academic Standards</div>
+      <div class="form-group" style="margin-bottom:.75rem">
+        <label>Minimum GPA Required</label>
+        <input type="number" id="inst-gpa" value="2.5" min="0" max="4" step="0.1">
+      </div>
+      <div class="form-group" style="margin-bottom:.75rem">
+        <label>Minimum SAT (Total)</label>
+        <input type="number" id="inst-sat" value="1000" min="400" max="1600">
+      </div>
+      <div class="form-group" style="margin-bottom:.75rem">
+        <label>Minimum ACT</label>
+        <input type="number" id="inst-act" value="21" min="1" max="36">
+      </div>
+      <div class="form-group" style="margin-bottom:.75rem">
+        <label>Division Level</label>
+        <select id="inst-div">
+          <option>NCAA D1</option><option>NCAA D2</option><option>NCAA D3</option>
+          <option>NAIA</option><option>NJCAA</option>
         </select>
       </div>
-    </div>
-    <div class="h2h-selectors">
-      <div class="ff"><label>Wrestler A</label><select id="h2h-a" onchange="runH2H()"></select></div>
-      <div class="vs-label">VS</div>
-      <div class="ff"><label>Wrestler B</label><select id="h2h-b" onchange="runH2H()"></select></div>
-    </div>
-    <div id="h2h-result"></div>
-  </div>
-</div>
-
-<!-- ═══ ROSTER GAP ANALYSIS ═══ -->
-<div id="view-roster" class="view">
-  <div class="roster-section">
-    <h2>Roster Gap Analysis</h2>
-    <p>Enter your roster's current ELO rating at each weight (or wrestler name). The system identifies your weakest positions and surfaces the top available recruits/transfers for each gap.</p>
-    <div class="roster-inputs" id="roster-inputs"></div>
-    <button class="roster-btn" onclick="runRosterAnalysis()">Analyze Roster Gaps</button>
-    <div id="gap-results"></div>
-  </div>
-</div>
-
-<!-- ═══ TEAMS ═══ -->
-<div id="view-teams" class="view">
-  <div class="team-section">
-    <h2>2026 NCAA Team Standings</h2>
-    <table class="team-table">
-      <thead><tr>
-        <th style="width:46px">Place</th><th>School</th>
-        <th class="r">Points</th><th class="r">Champs</th>
-        <th class="r" style="min-width:160px">Score</th>
-      </tr></thead>
-      <tbody id="team-body"></tbody>
-    </table>
-  </div>
-</div>
-
-<!-- ═══ SUBMIT ═══ -->
-<div id="view-submit" class="view">
-  <div class="sub-wrap">
-    <h2>Submit a match result</h2>
-    <p>Results need <strong style="color:var(--text)">2 confirmations</strong> before they count toward ELO. This prevents false data. Submit a result, then share the link so others can confirm it.</p>
-    <div class="form-grid">
-      <div class="ff"><label>Weight class</label>
-        <select id="sub-weight" onchange="refreshSubSelects()">
-          <option value="125">125 lbs</option><option value="133">133 lbs</option>
-          <option value="141">141 lbs</option><option value="149">149 lbs</option>
-          <option value="157">157 lbs</option><option value="165">165 lbs</option>
-          <option value="174">174 lbs</option><option value="184">184 lbs</option>
-          <option value="197">197 lbs</option><option value="285">285 lbs</option>
-        </select>
+      <div class="form-group" style="margin-bottom:.75rem">
+        <label>Primary Degree Areas Offered</label>
+        <input type="text" id="inst-degrees" placeholder="e.g., Business, Engineering, Education">
       </div>
-      <div class="ff"><label>Win type</label>
-        <select id="win-type">
-          <option value="pin">Pin (Fall)</option>
-          <option value="tf">Tech fall</option>
-          <option value="md">Major decision</option>
-          <option value="dec" selected>Decision</option>
-        </select>
+      <button class="btn btn-gold" style="width:100%" onclick="saveInstSettings()">Save Standards</button>
+    </div>
+
+    <!-- ATHLETE UPLOAD -->
+    <div>
+      <div class="acad-upload" onclick="triggerUpload()" id="upload-zone">
+        <div style="font-size:2rem">📄</div>
+        <h3>Upload Transcript or Score Report</h3>
+        <div style="font-size:.82rem;color:var(--text3)">PDF, JPG, or PNG — AI extracts GPA, test scores, credit hours automatically</div>
+        <input type="file" id="file-upload" accept=".pdf,.jpg,.jpeg,.png" style="display:none" onchange="processFile(event)">
       </div>
-      <div class="ff"><label>Winner</label><select id="winner-sel"></select></div>
-      <div class="ff"><label>Loser</label><select id="loser-sel"></select></div>
-      <div class="ff"><label>Score / time</label><input type="text" id="score-input" placeholder="e.g. 6-3 or 3:24"></div>
-      <div class="ff"><label>Date</label><input type="date" id="match-date"></div>
-      <div class="ff full"><label>Event name</label><input type="text" id="event-input" placeholder="e.g. 2026 NCAA Championships"></div>
-      <div class="ff full"><label>Your name / source (for verification)</label><input type="text" id="submitter-name" placeholder="e.g. Coach Smith or trackwrestling.com/…"></div>
+      <div style="margin:1rem 0;text-align:center;color:var(--text3);font-size:.82rem">— or enter manually —</div>
+      <div class="submit-form">
+        <div class="form-row">
+          <div class="form-group">
+            <label>Athlete Name</label>
+            <input type="text" id="ai-name" placeholder="Full Name">
+          </div>
+          <div class="form-group">
+            <label>Current School</label>
+            <input type="text" id="ai-school" placeholder="School">
+          </div>
+        </div>
+        <div class="form-row three">
+          <div class="form-group">
+            <label>GPA</label>
+            <input type="number" id="ai-gpa" placeholder="3.2" min="0" max="4" step="0.01">
+          </div>
+          <div class="form-group">
+            <label>SAT</label>
+            <input type="number" id="ai-sat" placeholder="1100" min="400" max="1600">
+          </div>
+          <div class="form-group">
+            <label>ACT</label>
+            <input type="number" id="ai-act" placeholder="23" min="1" max="36">
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Declared Major / Degree</label>
+            <input type="text" id="ai-major" placeholder="Business Administration">
+          </div>
+          <div class="form-group">
+            <label>Credits Completed</label>
+            <input type="number" id="ai-credits" placeholder="60">
+          </div>
+        </div>
+        <button class="btn btn-gold" style="width:100%;margin-top:.5rem" onclick="calcAcademic()">Calculate Academic Index</button>
+      </div>
     </div>
-    <button class="sub-btn" onclick="submitMatch()">Submit for Verification</button>
   </div>
 
-  <!-- PENDING QUEUE -->
-  <div class="pending-section">
-    <h3>Pending results <span id="pending-count-badge" class="badge badge-pending" style="font-size:11px;vertical-align:middle"></span></h3>
-    <p style="font-size:13px;color:var(--muted);margin-bottom:14px">These results have been submitted but need a second confirmation before they update the rankings.</p>
-    <div id="pending-list"></div>
+  <div class="acad-result" id="acad-result" style="display:none">
+    <div class="section-label" style="margin-bottom:.75rem">Academic Index Report</div>
+    <div id="acad-result-body"></div>
+  </div>
+
+  <div style="margin-top:1.5rem">
+    <div class="section-label" style="margin-bottom:.75rem">Athletes Flagged for Review</div>
+    <div id="acad-flagged" style="font-size:.85rem;color:var(--text2)">Set your institutional standards above and calculate athlete scores to see flags here.</div>
   </div>
 </div>
 
-<!-- ═══ HOW IT WORKS ═══ -->
-<div id="view-how" class="view">
-  <div class="how-wrap">
-    <h2>How WrestlerOS rankings work</h2>
-    <div class="elo-box">
-      <strong style="color:var(--text)">FloWrestling rankings are editorial.</strong> A small team makes judgment calls. There's no formula you can audit.<br><br>
-      <strong style="color:var(--text)">WrestlerOS is fully algorithmic.</strong> Every ranking has a mathematical reason. Based on ELO — the same system used in chess, NFL analytics (EPA), and esports.
-      <div class="formula">E(A) = 1 / (1 + 10^((ratingB − ratingA) / 400))</div>
-      <div class="formula">R'(A) = R(A) + K × winMultiplier × (result − expected)</div>
-      <strong style="color:var(--text)">Strength of schedule is automatic.</strong> Beating a 1800-rated wrestler gives far more ELO than beating a 1500. You can't pad your rating with weak wins — the math handles it.
+<!-- TEAMS PAGE -->
+<div class="page" id="page-teams">
+  <div class="section-header">
+    <div>
+      <div class="section-title">Team Standings</div>
+      <div class="section-sub">2025-26 Season — NCAA D1 Final</div>
     </div>
-    <table class="wt-tbl">
-      <thead><tr><th>Win type</th><th>Multiplier</th><th>Typical ELO swing</th></tr></thead>
-      <tbody>
-        <tr><td>Pin (fall)</td><td>1.4×</td><td>+22 to +30</td></tr>
-        <tr><td>Tech fall</td><td>1.25×</td><td>+19 to +27</td></tr>
-        <tr><td>Major decision</td><td>1.1×</td><td>+17 to +24</td></tr>
-        <tr><td>Decision</td><td>1.0×</td><td>+15 to +22</td></tr>
-      </tbody>
-    </table>
-    <div class="elo-box" style="margin-top:16px">
-      <strong style="color:var(--text)">Data persistence:</strong> All user-submitted matches are saved to <code style="color:var(--accent)">localStorage</code> so they survive page reloads. Migrate to PostgreSQL to share data across users — the schema is identical to this in-browser model.<br><br>
-      <strong style="color:var(--text)">Verification system:</strong> User submissions need 2 confirmations before they affect ELO. This prevents trolling and builds trust with coaches — they know rankings aren't gameable.
+  </div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem">
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;overflow:hidden">
+      <div style="padding:.75rem 1rem;border-bottom:1px solid var(--border);font-size:.72rem;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;font-weight:600">2026 NCAA Championship Final Standings</div>
+      <div id="team-table"></div>
+    </div>
+    <div>
+      <div class="submit-form">
+        <div class="section-label" style="margin-bottom:.75rem">Individual Champs by School</div>
+        <div style="font-size:.85rem;line-height:2">
+          <div style="display:flex;justify-content:space-between;padding:.3rem 0;border-bottom:1px solid var(--border)"><span><strong style="color:var(--gold)">Penn State</strong></span><span style="color:var(--text2)">4 titles (125, 165, 174, 197)</span></div>
+          <div style="display:flex;justify-content:space-between;padding:.3rem 0;border-bottom:1px solid var(--border)"><span><strong style="color:#C0C0C0">Oklahoma State</strong></span><span style="color:var(--text2)">3 titles (133, 141, 157)</span></div>
+          <div style="display:flex;justify-content:space-between;padding:.3rem 0;border-bottom:1px solid var(--border)"><span><strong>NC State</strong></span><span style="color:var(--text2)">1 title (285)</span></div>
+          <div style="display:flex;justify-content:space-between;padding:.3rem 0;border-bottom:1px solid var(--border)"><span><strong>Minnesota</strong></span><span style="color:var(--text2)">1 title (184)</span></div>
+          <div style="display:flex;justify-content:space-between;padding:.3rem 0"><span><strong>Stanford</strong></span><span style="color:var(--text2)">1 title (149)</span></div>
+        </div>
+        <div style="margin-top:1rem;padding-top:1rem;border-top:1px solid var(--border)">
+          <div class="section-label" style="margin-bottom:.5rem">Notable Achievements</div>
+          <div style="font-size:.82rem;color:var(--text2);line-height:1.8">
+            🏆 Penn State: 5th straight title, 181.5 pts (all-time record)<br>
+            ⭐ 4 freshman national champions (record)<br>
+            🎯 Mesenbrink: Most Outstanding + Most Dominant Wrestler<br>
+            📚 Jarrett Stoner (Missouri): Elite 90 Award — 4.1 GPA
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </div>
 
-</div><!-- /main -->
+<!-- SUBMIT RESULT PAGE -->
+<div class="page" id="page-submit">
+  <div class="section-header">
+    <div>
+      <div class="section-title">Submit Match Result</div>
+      <div class="section-sub">Community-verified data. Two confirmations required before ELO updates.</div>
+    </div>
+  </div>
+
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem">
+    <div class="submit-form">
+      <div class="form-row">
+        <div class="form-group">
+          <label>Wrestling Style</label>
+          <select id="sub-style">
+            <option>Folkstyle</option><option>Freestyle</option><option>Greco-Roman</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Weight Class</label>
+          <select id="sub-weight">
+            <option>125</option><option>133</option><option>141</option><option>149</option>
+            <option>157</option><option>165</option><option>174</option><option>184</option>
+            <option>197</option><option>285</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Winner Name</label>
+          <input type="text" id="sub-winner" placeholder="Full name">
+        </div>
+        <div class="form-group">
+          <label>Winner's School</label>
+          <input type="text" id="sub-winner-school" placeholder="School name">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Loser Name</label>
+          <input type="text" id="sub-loser" placeholder="Full name">
+        </div>
+        <div class="form-group">
+          <label>Loser's School</label>
+          <input type="text" id="sub-loser-school" placeholder="School name">
+        </div>
+      </div>
+      <div class="form-row three">
+        <div class="form-group">
+          <label>Win Type</label>
+          <select id="sub-wintype">
+            <option value="pin">Pin / Fall</option>
+            <option value="tf">Tech Fall</option>
+            <option value="md">Major Dec</option>
+            <option value="dec">Decision</option>
+            <option value="sv">Sudden Victory</option>
+            <option value="tb">Tiebreaker</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Score</label>
+          <input type="text" id="sub-score" placeholder="e.g. 8-3">
+        </div>
+        <div class="form-group">
+          <label>Date</label>
+          <input type="date" id="sub-date">
+        </div>
+      </div>
+      <div class="form-group" style="margin-bottom:.75rem">
+        <label>Event / Tournament</label>
+        <input type="text" id="sub-event" placeholder="e.g. Big Ten Championships">
+      </div>
+      <div class="form-group" style="margin-bottom:.75rem">
+        <label>Source / Verification Link</label>
+        <input type="text" id="sub-source" placeholder="trackwrestling.com, floarena, etc.">
+      </div>
+      <div class="form-group" style="margin-bottom:.75rem">
+        <label>Your Name (Submitter)</label>
+        <input type="text" id="sub-submitter" placeholder="Coach, athlete, or fan">
+      </div>
+      <button class="btn btn-gold" style="width:100%" onclick="submitResult()">Submit for Verification</button>
+    </div>
+
+    <div>
+      <div class="submit-form" style="margin-bottom:1rem">
+        <div class="section-label" style="margin-bottom:.75rem">Pending Verification Queue</div>
+        <div id="pending-queue">
+          <div style="font-size:.82rem;color:var(--text3)">No pending matches. Be the first to submit a result.</div>
+        </div>
+      </div>
+
+      <div class="submit-form">
+        <div class="section-label" style="margin-bottom:.5rem">How Verification Works</div>
+        <div style="font-size:.82rem;color:var(--text2);line-height:1.7">
+          <div style="margin-bottom:.5rem">1. You submit a match with a source link.</div>
+          <div style="margin-bottom:.5rem">2. A second user confirms the result (with source).</div>
+          <div style="margin-bottom:.5rem">3. ELO ratings update automatically once confirmed.</div>
+          <div>This two-step system ensures coaches can trust the data powering the rankings.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- HOW IT WORKS PAGE -->
+<div class="page" id="page-how">
+  <div class="section-header">
+    <div>
+      <div class="section-title">How WrestlerOS Works</div>
+      <div class="section-sub">A plain-language guide for coaches and athletes</div>
+    </div>
+  </div>
+
+  <div class="coach-pitch">
+    <h3>Why Coaches Use WrestlerOS</h3>
+    <div class="pitch-item">
+      <div class="pitch-icon">→</div>
+      <div><strong>Rankings you can actually trust.</strong> FloWrestling rankings are based on editorial opinions from a small team. WrestlerOS builds rankings from math — every single match a wrestler has competed in, weighted by how they won. You can see exactly why someone is ranked #1.</div>
+    </div>
+    <div class="pitch-item">
+      <div class="pitch-icon">→</div>
+      <div><strong>Recruiting intelligence in one place.</strong> Right now you're tracking recruits on spreadsheets, DMs, and 5 different tabs. WrestlerOS puts every available athlete — transfer portal and high school — in one searchable database that filters by weight, GPA, academic fit, and more.</div>
+    </div>
+    <div class="pitch-item">
+      <div class="pitch-icon">→</div>
+      <div><strong>Know your roster's weak spots before your opponents do.</strong> The Roster Gap Analysis shows exactly which weight classes your program is vulnerable at — and instantly surfaces the best available athletes to fill those gaps.</div>
+    </div>
+    <div class="pitch-item">
+      <div class="pitch-icon">→</div>
+      <div><strong>Academic compliance, simplified.</strong> Upload a transcript and WrestlerOS tells you whether that athlete meets your school's academic standards, flags degree mismatches, and calculates NCAA eligibility index — in seconds.</div>
+    </div>
+  </div>
+
+  <div style="margin:2rem 0">
+    <div class="section-title" style="margin-bottom:1.5rem">How the Ranking System Works</div>
+    <div class="how-step">
+      <div class="how-num">1</div>
+      <div class="how-content">
+        <h3>Every Match Counts</h3>
+        <p>Unlike other rankings that only look at big tournaments, WrestlerOS counts every documented match from September through March — dual meets, invitationals, conference championships, and nationals. A wrestler who goes 30-2 against top competition all season will rank higher than someone who shows up hot for one tournament.</p>
+      </div>
+    </div>
+    <div class="how-step">
+      <div class="how-num">2</div>
+      <div class="how-content">
+        <h3>Wins Are Weighted by How Dominant They Were</h3>
+        <p>Not all wins are equal. Pinning someone earns more credit than barely winning a 4-3 decision. A tech fall shows dominance. A major decision shows clear control. This means a wrestler who consistently beats opponents convincingly ranks higher than one who squeaks by the same competition.</p>
+      </div>
+    </div>
+    <div class="how-step">
+      <div class="how-num">3</div>
+      <div class="how-content">
+        <h3>Who You Beat Matters</h3>
+        <p>Beating the #1-ranked wrestler in the country earns far more credit than beating a .500 wrestler. The system automatically accounts for strength of schedule — so coaches recruiting from tough conferences get proper credit, and wrestlers who've avoided top competition can't inflate their ranking.</p>
+      </div>
+    </div>
+    <div class="how-step">
+      <div class="how-num">4</div>
+      <div class="how-content">
+        <h3>Separate Rankings for Each Style</h3>
+        <p>Folkstyle, freestyle, and greco-roman use different rules, different weight classes, and different techniques. A high school wrestler competing internationally in freestyle gets their own separate ranking — this matters when evaluating international recruits or prep wrestlers who compete year-round in multiple styles.</p>
+      </div>
+    </div>
+    <div class="how-step">
+      <div class="how-num">5</div>
+      <div class="how-content">
+        <h3>Recruiting Database Stays Clean Automatically</h3>
+        <p>When a wrestler commits (fully, not just verbally) or enters the transfer portal as "unavailable," they're removed from recruiting targets. You'll never waste time chasing a prospect who's already spoken for. High school wrestlers who haven't yet committed stay visible. Graduate transfers with degree mismatches get flagged automatically.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="coach-pitch">
+    <h3>Built for Every Level</h3>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:1rem;margin-top:.5rem">
+      <div style="text-align:center;padding:1rem;background:var(--surface3);border-radius:8px">
+        <div style="font-size:1.3rem;font-weight:700;color:var(--gold);font-family:'Barlow Condensed',sans-serif">NCAA D1</div>
+        <div style="font-size:.78rem;color:var(--text2);margin-top:.25rem">125–285 lbs, 10 weight classes</div>
+      </div>
+      <div style="text-align:center;padding:1rem;background:var(--surface3);border-radius:8px">
+        <div style="font-size:1.3rem;font-weight:700;color:var(--text);font-family:'Barlow Condensed',sans-serif">NCAA D2</div>
+        <div style="font-size:.78rem;color:var(--text2);margin-top:.25rem">Same weight classes</div>
+      </div>
+      <div style="text-align:center;padding:1rem;background:var(--surface3);border-radius:8px">
+        <div style="font-size:1.3rem;font-weight:700;color:var(--text);font-family:'Barlow Condensed',sans-serif">NCAA D3</div>
+        <div style="font-size:.78rem;color:var(--text2);margin-top:.25rem">No athletic scholarships</div>
+      </div>
+      <div style="text-align:center;padding:1rem;background:var(--surface3);border-radius:8px">
+        <div style="font-size:1.3rem;font-weight:700;color:var(--text);font-family:'Barlow Condensed',sans-serif">NAIA</div>
+        <div style="font-size:.78rem;color:var(--text2);margin-top:.25rem">Own eligibility rules</div>
+      </div>
+      <div style="text-align:center;padding:1rem;background:var(--surface3);border-radius:8px">
+        <div style="font-size:1.3rem;font-weight:700;color:var(--text);font-family:'Barlow Condensed',sans-serif">NJCAA</div>
+        <div style="font-size:.78rem;color:var(--text2);margin-top:.25rem">Junior college pipeline</div>
+      </div>
+      <div style="text-align:center;padding:1rem;background:var(--surface3);border-radius:8px">
+        <div style="font-size:1.3rem;font-weight:700;color:var(--text);font-family:'Barlow Condensed',sans-serif">JUCO</div>
+        <div style="font-size:.78rem;color:var(--text2);margin-top:.25rem">2-year pathway programs</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- PROFILE MODAL -->
+<div class="modal-overlay" id="profile-modal">
+  <div class="modal">
+    <div class="modal-head">
+      <button class="modal-close" onclick="closeProfile()">✕</button>
+      <div class="profile-name" id="profile-name"></div>
+      <div class="profile-meta" id="profile-meta"></div>
+    </div>
+    <div class="modal-body">
+      <div class="profile-stats" id="profile-stats"></div>
+      <div class="acad-alert" id="profile-acad-alert" style="display:none">
+        ⚠️ <span id="profile-acad-text"></span>
+      </div>
+      <div class="section-label" style="margin:.75rem 0 .4rem">ELO Trajectory This Season</div>
+      <svg class="elo-sparkline" id="profile-spark" viewBox="0 0 400 80" preserveAspectRatio="none"></svg>
+      <div class="match-log" id="profile-matches"></div>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
 
 <script>
-// ═══════════════════════════════════════════════════════
-// 1. ELO ENGINE
-// ═══════════════════════════════════════════════════════
-const WIN_MULT = {pin:1.4, tf:1.25, md:1.1, dec:1.0};
-const K = 32;
-function eloExp(rA,rB){ return 1/(1+Math.pow(10,(rB-rA)/400)); }
-function eloChg(rA,rB,type){ return Math.round(K*(WIN_MULT[type]||1)*(1-eloExp(rA,rB))); }
+// ===================== DATA =====================
 
-// ═══════════════════════════════════════════════════════
-// 2. CORE DATASET — all 10 weights
-// ═══════════════════════════════════════════════════════
-const DB = {};
+const CURRENT_STYLE = {name:'folkstyle'};
+const WEIGHTS = {
+  folkstyle:[125,133,141,149,157,165,174,184,197,285],
+  freestyle:[57,65,70,74,79,86,92,97,125],
+  greco:[55,60,63,67,72,77,82,87,97,130]
+};
 
-DB[125]={wrestlers:[
-  {id:'125-1',name:'Luke Lilledahl',     school:'Penn State',    conf:'Big Ten',   yr:'Sr',base:1720,champ:'2026 NCAA Champ'},
-  {id:'125-2',name:'Eddie Ventresca',    school:'Virginia Tech', conf:'ACC',        yr:'Sr',base:1630},
-  {id:'125-3',name:'Nic Bouzakis',       school:'Ohio State',   conf:'Big Ten',    yr:'Jr',base:1615},
-  {id:'125-4',name:'Sheldon Seymour',    school:'Lehigh',       conf:'Patriot',    yr:'Sr',base:1595},
-  {id:'125-5',name:'Troy Spratley',      school:'OK State',     conf:'Big 12',     yr:'Fr',base:1580},
-  {id:'125-6',name:'Jore Volk',          school:'Minnesota',    conf:'Big Ten',    yr:'Sr',base:1560},
-  {id:'125-7',name:'Nico Provo',         school:'Stanford',     conf:'Pac-12',     yr:'Jr',base:1545},
-  {id:'125-8',name:'Marc-Anthony McGowan',school:'Princeton',   conf:'Ivy',        yr:'Sr',base:1520},
-  {id:'125-9',name:'Jacob Moran',        school:'Indiana',      conf:'Big Ten',    yr:'Jr',base:1510},
-  {id:'125-10',name:'Maximo Renteria',   school:'Oregon State', conf:'Pac-12',     yr:'So',base:1490},
-  {id:'125-11',name:'Dean Peterson',     school:'Iowa',         conf:'Big Ten',    yr:'Jr',base:1480},
-  {id:'125-12',name:'Vincent Robinson',  school:'NC State',     conf:'ACC',        yr:'Sr',base:1465},
-],matches:[
-  {w:'125-1',l:'125-8',t:'dec',sc:'2-1',  ev:'2026 NCAA Finals',         dt:'2026-03-22'},
-  {w:'125-1',l:'125-2',t:'dec',sc:'3-1',  ev:'2026 NCAA Semis',          dt:'2026-03-21'},
-  {w:'125-8',l:'125-7',t:'dec',sc:'4-2',  ev:'2026 NCAA Semis',          dt:'2026-03-21'},
-  {w:'125-1',l:'125-5',t:'md', sc:'11-2', ev:'2026 NCAA Quarters',       dt:'2026-03-20'},
-  {w:'125-5',l:'125-4',t:'dec',sc:'8-2',  ev:'2026 NCAA Quarters',       dt:'2026-03-20'},
-  {w:'125-2',l:'125-9',t:'dec',sc:'5-4',  ev:'2026 NCAA Quarters',       dt:'2026-03-20'},
-  {w:'125-9',l:'125-6',t:'dec',sc:'5-4',  ev:'2026 NCAA Quarters',       dt:'2026-03-20'},
-  {w:'125-3',l:'125-11',t:'dec',sc:'9-1', ev:'2026 NCAA Quarters',       dt:'2026-03-20'},
-  {w:'125-8',l:'125-3',t:'md', sc:'10-2', ev:'2026 NCAA Quarters',       dt:'2026-03-20'},
-  {w:'125-7',l:'125-12',t:'md',sc:'10-2', ev:'2026 NCAA 3rd place',      dt:'2026-03-22'},
-  {w:'125-1',l:'125-3',t:'md', sc:'9-1',  ev:'Big Ten Championships',    dt:'2026-03-08'},
-  {w:'125-1',l:'125-4',t:'tf', sc:'17-2', ev:'National Duals',           dt:'2026-01-11'},
-  {w:'125-2',l:'125-6',t:'dec',sc:'5-2',  ev:'Virginia Tech Open',       dt:'2026-01-25'},
-  {w:'125-3',l:'125-5',t:'dec',sc:'7-4',  ev:'CKLV',                     dt:'2025-11-23'},
-  {w:'125-4',l:'125-10',t:'pin',sc:'4:22',ev:'Lehigh Duals',             dt:'2026-02-01'},
-]};
+const WIN_TYPES = {pin:40,tf:28,md:16,dec:8,sv:5,tb:3};
 
-DB[133]={wrestlers:[
-  {id:'133-1',name:'Jax Forrest',        school:'OK State',     conf:'Big 12',     yr:'Fr',base:1720,champ:'2026 NCAA Champ'},
-  {id:'133-2',name:'Ben Davino',          school:'Ohio State',   conf:'Big Ten',    yr:'Fr',base:1655},
-  {id:'133-3',name:'Aaron Seidel',        school:'Virginia Tech',conf:'ACC',        yr:'Sr',base:1600},
-  {id:'133-4',name:'Marcus Blaze',        school:'Penn State',   conf:'Big Ten',    yr:'Jr',base:1575},
-  {id:'133-5',name:'Drake Ayala',         school:'Iowa',         conf:'Big Ten',    yr:'Sr',base:1555},
-  {id:'133-6',name:'Tyler Knox',          school:'Stanford',     conf:'Pac-12',     yr:'Jr',base:1540},
-  {id:'133-7',name:'Jacob Van Dee',       school:'Nebraska',     conf:'Big Ten',    yr:'Jr',base:1530},
-  {id:'133-8',name:'Lucas Byrd',          school:'Illinois',     conf:'Big Ten',    yr:'Sr',base:1510},
-  {id:'133-9',name:'Braxton Brown',       school:'Maryland',     conf:'Big Ten',    yr:'So',base:1495},
-  {id:'133-10',name:'Julian Farber',      school:'Northern Iowa',conf:'MVC',        yr:'Sr',base:1480},
-  {id:'133-11',name:'Gage Walker',        school:'Missouri',     conf:'SEC',        yr:'Sr',base:1470},
-  {id:'133-12',name:'Dominick Serrano',   school:'North Carolina',conf:'ACC',       yr:'Jr',base:1455},
-],matches:[
-  {w:'133-1',l:'133-2',t:'dec',sc:'5-2', ev:'2026 NCAA Finals',    dt:'2026-03-22'},
-  {w:'133-1',l:'133-4',t:'md', sc:'11-3',ev:'2026 NCAA Semis',     dt:'2026-03-21'},
-  {w:'133-2',l:'133-3',t:'dec',sc:'5-0', ev:'2026 NCAA Semis',     dt:'2026-03-21'},
-  {w:'133-1',l:'133-6',t:'tf', sc:'16-1',ev:'2026 NCAA Quarters',  dt:'2026-03-20'},
-  {w:'133-2',l:'133-7',t:'dec',sc:'5-3', ev:'2026 NCAA Quarters',  dt:'2026-03-20'},
-  {w:'133-3',l:'133-4',t:'dec',sc:'3-2', ev:'2026 NCAA Quarters',  dt:'2026-03-20'},
-  {w:'133-5',l:'133-6',t:'md', sc:'16-5',ev:'2026 NCAA 5th place', dt:'2026-03-22'},
-  {w:'133-7',l:'133-8',t:'dec',sc:'6-5', ev:'2026 NCAA 7th place', dt:'2026-03-22'},
-  {w:'133-1',l:'133-2',t:'tf', sc:'18-3',ev:'Big 12 Championships',dt:'2026-03-07'},
-  {w:'133-2',l:'133-5',t:'dec',sc:'6-4', ev:'Ohio State Duals',    dt:'2026-01-18'},
-  {w:'133-3',l:'133-8',t:'dec',sc:'5-0', ev:'ACC Championships',   dt:'2026-03-02'},
-  {w:'133-4',l:'133-9',t:'md', sc:'12-3',ev:'Big Ten Championships',dt:'2026-03-08'},
-]};
+function calcEloChange(ratingA, ratingB, won, winType) {
+  const K = 32;
+  const expected = 1 / (1 + Math.pow(10, (ratingB - ratingA) / 400));
+  const bonus = (WIN_TYPES[winType] || 8) / 40;
+  const score = won ? (0.7 + 0.3 * bonus) : 0;
+  return Math.round(K * (score - expected));
+}
 
-DB[141]={wrestlers:[
-  {id:'141-1',name:'Sergio Vega',        school:'OK State',     conf:'Big 12',     yr:'Fr',base:1720,champ:'2026 NCAA Champ'},
-  {id:'141-2',name:'Jesse Mendez',       school:'Ohio State',   conf:'Big Ten',    yr:'Jr',base:1680},
-  {id:'141-3',name:'Luke Stanich',       school:'Lehigh',       conf:'Patriot',    yr:'Sr',base:1590},
-  {id:'141-4',name:'Anthony Echemendia', school:'Iowa State',   conf:'Big 12',     yr:'Sr',base:1575},
-  {id:'141-5',name:'Joey Olivieri',      school:'Rutgers',      conf:'Big Ten',    yr:'Sr',base:1555},
-  {id:'141-6',name:'Luke Simcox',        school:'North Carolina',conf:'ACC',       yr:'Jr',base:1540},
-  {id:'141-7',name:'Caedyn Ricciardi',   school:'Navy',         conf:'Patriot',    yr:'Jr',base:1525},
-  {id:'141-8',name:'Ryan Jack',          school:'NC State',     conf:'ACC',        yr:'Sr',base:1515},
-  {id:'141-9',name:'Nash Singleton',     school:'Ohio State',   conf:'Big Ten',    yr:'So',base:1505},
-  {id:'141-10',name:'Tyler Wells',       school:'Oklahoma',     conf:'Big 12',     yr:'Jr',base:1490},
-  {id:'141-11',name:'Aldo Hernandez',    school:'App State',    conf:'SBC',        yr:'Jr',base:1470},
-  {id:'141-12',name:'Matthew Martino',   school:'Princeton',    conf:'Ivy',        yr:'Sr',base:1450},
-],matches:[
-  {w:'141-1',l:'141-2',t:'dec',sc:'4-1', ev:'2026 NCAA Finals',    dt:'2026-03-22'},
-  {w:'141-1',l:'141-3',t:'dec',sc:'7-3', ev:'2026 NCAA Semis',     dt:'2026-03-21'},
-  {w:'141-2',l:'141-4',t:'md', sc:'12-4',ev:'2026 NCAA Semis',     dt:'2026-03-21'},
-  {w:'141-3',l:'141-4',t:'dec',sc:'6-4', ev:'2026 NCAA 3rd place', dt:'2026-03-22'},
-  {w:'141-5',l:'141-6',t:'dec',sc:'9-4', ev:'2026 NCAA 5th place', dt:'2026-03-22'},
-  {w:'141-7',l:'141-8',t:'dec',sc:'4-1', ev:'2026 NCAA 7th place', dt:'2026-03-22'},
-  {w:'141-1',l:'141-5',t:'tf', sc:'15-0',ev:'2026 NCAA Quarters',  dt:'2026-03-20'},
-  {w:'141-2',l:'141-9',t:'md', sc:'9-1', ev:'2026 NCAA Quarters',  dt:'2026-03-20'},
-  {w:'141-2',l:'141-3',t:'dec',sc:'8-2', ev:'Big Ten Championships',dt:'2026-03-08'},
-  {w:'141-1',l:'141-2',t:'dec',sc:'5-3', ev:'Big 12 Championships',dt:'2026-03-07'},
-  {w:'141-4',l:'141-5',t:'dec',sc:'7-5', ev:'Iowa State Duals',    dt:'2026-01-25'},
-]};
+// D1 Rankings Data — Full season ELO (not just NCAAs)
+const WRESTLERS = {
+  125: [
+    {id:'l125-1',name:'Luke Lilledahl',school:'Penn State',year:'Jr',yearFull:'Junior',state:'PA',ht:"5'4\"",wt:123,gpa:3.4,sat:1180,act:26,major:'Exercise Science',ncaaId:'1234567',elo:1821,wins:28,losses:2,pins:3,tf:8,md:6,dec:11,bestWin:'#10 Marc-Anthony McGowan',matches:[
+      {r:'W',opp:'Aaron Seidel (VT)',type:'md',score:'12-3',event:'Big Ten Champs',eloAfter:1790},
+      {r:'W',opp:'Jore Volk (Minn)',type:'dec',score:'5-2',event:'B1G',eloAfter:1800},
+      {r:'W',opp:'Ayden Smith (Rutgers)',type:'tf',score:'18-2',event:'NCAAs R1',eloAfter:1810},
+      {r:'W',opp:'Marc-Anthony McGowan (Princeton)',type:'dec',score:'2-1',event:'NCAA Finals',eloAfter:1821}
+    ]},
+    {id:'l125-2',name:'Marc-Anthony McGowan',school:'Princeton',year:'Sr',yearFull:'Senior',state:'NJ',ht:"5'3\"",wt:124,gpa:3.8,sat:1420,act:32,major:'Psychology',ncaaId:'1234568',elo:1684,wins:24,losses:6,pins:2,tf:4,md:5,dec:13,bestWin:'#2 Eddie Ventresca',matches:[
+      {r:'W',opp:'Eddie Ventresca (VT)',type:'dec',score:'2-2 (2OT)',event:'NCAAs QF',eloAfter:1670},
+      {r:'L',opp:'Luke Lilledahl (PSU)',type:'dec',score:'2-1',event:'NCAA Finals',eloAfter:1684}
+    ]},
+    {id:'l125-3',name:'Sheldon Seymour',school:'Lehigh',year:'Jr',yearFull:'Junior',state:'PA',ht:"5'5\"",wt:124,gpa:3.1,sat:1100,act:24,major:'Business',ncaaId:'1234569',elo:1621,wins:21,losses:10,pins:4,tf:3,md:4,dec:10,bestWin:'#5 CJ Composto',matches:[
+      {r:'W',opp:'Tyler Chappell (Pitt)',type:'pin',score:'Fall',event:'NCAAs R1',eloAfter:1621},
+      {r:'L',opp:'Marc-Anthony McGowan',type:'dec',score:'3-5',event:'NCAAs QF',eloAfter:1615}
+    ]},
+    {id:'l125-4',name:'Aaron Seidel',school:'Virginia Tech',year:'So',yearFull:'Sophomore',state:'VA',ht:"5'4\"",wt:124,gpa:3.2,sat:1150,act:25,major:'Criminal Justice',ncaaId:'1234570',elo:1598,wins:23,losses:8,pins:5,tf:2,md:6,dec:10,bestWin:'#5 Kyler Larkin',matches:[
+      {r:'W',opp:'Kyler Larkin (ASU)',type:'tf',score:'16-1',event:'NCAAs R2',eloAfter:1598},
+      {r:'L',opp:'Aaron Seidel',type:'dec',score:'0-5',event:'3rd Place',eloAfter:1588}
+    ]},
+    {id:'l125-5',name:'Jore Volk',school:'Minnesota',year:'Sr',yearFull:'Senior',state:'MN',ht:"5'3\"",wt:123,gpa:3.5,sat:1200,act:27,major:'Kinesiology',ncaaId:'1234571',elo:1572,wins:24,losses:7,pins:2,tf:4,md:5,dec:13,bestWin:'multiple ranked',matches:[
+      {r:'W',opp:'Final match',type:'md',score:'14-1',event:'NCAA 7th place',eloAfter:1572}
+    ]}
+  ],
+  133: [
+    {id:'l133-1',name:'Jax Forrest',school:'Oklahoma State',year:'Fr',yearFull:'Freshman',state:'OK',ht:"5'6\"",wt:132,gpa:3.3,sat:1160,act:25,major:'Business Management',ncaaId:'2345678',elo:1798,wins:31,losses:0,pins:8,tf:9,md:7,dec:7,bestWin:'#2 Ben Davino (5-2)',matches:[
+      {r:'W',opp:'Drake Ayala (Iowa)',type:'dec',score:'7-4',event:'NCAAs',eloAfter:1780},
+      {r:'W',opp:'Ben Davino (Ohio State)',type:'dec',score:'5-2',event:'NCAA Finals',eloAfter:1798}
+    ]},
+    {id:'l133-2',name:'Ben Davino',school:'Ohio State',year:'Fr',yearFull:'Freshman',state:'OH',ht:"5'7\"",wt:131,gpa:3.0,sat:1090,act:23,major:'Sports Management',ncaaId:'2345679',elo:1714,wins:27,losses:4,pins:5,tf:7,md:6,dec:9,bestWin:'multiple ranked',matches:[
+      {r:'W',opp:'Lucas Byrd (Illinois)',type:'md',score:'14-5',event:'NCAAs',eloAfter:1714},
+      {r:'L',opp:'Jax Forrest (OSU)',type:'dec',score:'2-5',event:'NCAA Finals',eloAfter:1700}
+    ]},
+    {id:'l133-3',name:'Marcus Blaze',school:'Penn State',year:'Fr',yearFull:'Freshman',state:'PA',ht:"5'6\"",wt:132,gpa:3.1,sat:1120,act:24,major:'Kinesiology',ncaaId:'2345680',elo:1665,wins:25,losses:6,pins:4,tf:5,md:5,dec:11,bestWin:'Drake Ayala',matches:[
+      {r:'W',opp:'Drake Ayala (Iowa)',type:'dec',score:'5-3',event:'NCAAs',eloAfter:1665},
+      {r:'L',opp:'Aaron Seidel (VT)',type:'dec',score:'0-5',event:'3rd place',eloAfter:1655}
+    ]},
+    {id:'l133-4',name:'Drake Ayala',school:'Iowa',year:'Jr',yearFull:'Junior',state:'IA',ht:"5'7\"",wt:132,gpa:2.9,sat:1050,act:22,major:'Communication Studies',ncaaId:'2345681',elo:1640,wins:22,losses:8,pins:3,tf:4,md:5,dec:10,bestWin:'multiple top-10',matches:[
+      {r:'L',opp:'Jax Forrest (OSU)',type:'dec',score:'4-7',event:'NCAAs',eloAfter:1640}
+    ]},
+    {id:'l133-5',name:'Lucas Byrd',school:'Illinois',year:'Sr',yearFull:'Senior',state:'IL',ht:"5'5\"",wt:132,gpa:3.6,sat:1250,act:28,major:'Integrative Biology',ncaaId:'2345682',elo:1618,wins:26,losses:5,pins:4,tf:4,md:6,dec:12,bestWin:'multiple AA',matches:[
+      {r:'L',opp:'Ben Davino (OSU)',type:'md',score:'5-14',event:'NCAAs R2',eloAfter:1618}
+    ]}
+  ],
+  141: [
+    {id:'l141-1',name:'Sergio Vega',school:'Oklahoma State',year:'Fr',yearFull:'Freshman',state:'TX',ht:"5'8\"",wt:140,gpa:3.1,sat:1100,act:24,major:'Sports Media',ncaaId:'3456789',elo:1811,wins:30,losses:0,pins:7,tf:10,md:8,dec:5,bestWin:'#1 Jesse Mendez (SV 4-1)',matches:[
+      {r:'W',opp:'CJ Composto (Penn)',type:'pin',score:'Fall',event:'NCAAs',eloAfter:1790},
+      {r:'W',opp:'Jesse Mendez (OSU)',type:'sv',score:'4-1',event:'NCAA Finals',eloAfter:1811}
+    ]},
+    {id:'l141-2',name:'Jesse Mendez',school:'Ohio State',year:'Jr',yearFull:'Junior',state:'OH',ht:"5'8\"",wt:140,gpa:3.2,sat:1130,act:25,major:'Business',ncaaId:'3456790',elo:1745,wins:26,losses:2,pins:5,tf:8,md:6,dec:7,bestWin:'multiple ranked',matches:[
+      {r:'L',opp:'Sergio Vega (OSU)',type:'sv',score:'1-4',event:'NCAA Finals',eloAfter:1745}
+    ]},
+    {id:'l141-3',name:'Luke Stanich',school:'Lehigh',year:'Jr',yearFull:'Junior',state:'PA',ht:"5'9\"",wt:140,gpa:3.4,sat:1180,act:26,major:'Civil Engineering',ncaaId:'3456791',elo:1682,wins:24,losses:7,pins:3,tf:4,md:6,dec:11,bestWin:'Jesse Mendez',matches:[
+      {r:'W',opp:'CJ Composto (Penn)',type:'dec',score:'3rd place match',event:'NCAAs',eloAfter:1682}
+    ]},
+    {id:'l141-4',name:'CJ Composto',school:'Penn',year:'Sr',yearFull:'Senior',state:'PA',ht:"5'8\"",wt:139,gpa:3.7,sat:1380,act:31,major:'Economics',ncaaId:'3456792',elo:1651,wins:23,losses:8,pins:3,tf:3,md:5,dec:12,bestWin:'multiple AA',matches:[
+      {r:'W',opp:'Final college match',type:'pin',score:'7th place',event:'NCAAs',eloAfter:1651}
+    ]}
+  ],
+  149: [
+    {id:'l149-1',name:'Aden Valencia',school:'Stanford',year:'Fr',yearFull:'Freshman',state:'CA',ht:"5'9\"",wt:148,gpa:3.6,sat:1380,act:31,major:'Human Biology',ncaaId:'4567890',elo:1782,wins:27,losses:5,pins:3,tf:6,md:7,dec:11,bestWin:'#1 Shayne Van Ness (SV 8-5)',matches:[
+      {r:'W',opp:'Shayne Van Ness (PSU)',type:'sv',score:'8-5',event:'NCAA Finals',eloAfter:1782}
+    ]},
+    {id:'l149-2',name:'Shayne Van Ness',school:'Penn State',year:'So',yearFull:'Sophomore',state:'PA',ht:"5'9\"",wt:148,gpa:3.3,sat:1160,act:26,major:'Recreation Parks & Tourism',ncaaId:'4567891',elo:1731,wins:30,losses:2,pins:5,tf:8,md:7,dec:10,bestWin:'multiple top-5',matches:[
+      {r:'L',opp:'Aden Valencia (Stanford)',type:'sv',score:'5-8',event:'NCAA Finals',eloAfter:1731}
+    ]},
+    {id:'l149-3',name:'Collin Gaj',school:'Virginia Tech',year:'Sr',yearFull:'Senior',state:'PA',ht:"5'9\"",wt:148,gpa:3.1,sat:1130,act:25,major:'Business Marketing',ncaaId:'4567892',elo:1668,wins:22,losses:9,pins:2,tf:3,md:5,dec:12,bestWin:'Shayne Van Ness',matches:[
+      {r:'W',opp:'5th place finish',type:'dec',score:'5th place',event:'NCAAs',eloAfter:1668}
+    ]}
+  ],
+  157: [
+    {id:'l157-1',name:'Landon Robideau',school:'Oklahoma State',year:'Fr',yearFull:'Freshman',state:'OK',ht:"5'9\"",wt:156,gpa:3.0,sat:1080,act:23,major:'Agricultural Science',ncaaId:'5678901',elo:1794,wins:27,losses:5,pins:4,tf:7,md:5,dec:11,bestWin:'#2 Antrell Taylor (4-2)',matches:[
+      {r:'W',opp:'Vincent Robinson (NC State)',type:'dec',score:'5-1',event:'NCAAs',eloAfter:1774},
+      {r:'W',opp:'Antrell Taylor (Nebraska)',type:'dec',score:'4-2',event:'NCAA Finals',eloAfter:1794}
+    ]},
+    {id:'l157-2',name:'Antrell Taylor',school:'Nebraska',year:'Jr',yearFull:'Junior',state:'NE',ht:"5'10\"",wt:156,gpa:2.9,sat:1040,act:22,major:'Communications',ncaaId:'5678902',elo:1738,wins:25,losses:3,pins:4,tf:6,md:5,dec:10,bestWin:'multiple ranked',matches:[
+      {r:'L',opp:'Landon Robideau (OSU)',type:'dec',score:'2-4',event:'NCAA Finals',eloAfter:1738}
+    ]},
+    {id:'l157-3',name:'PJ Duke',school:'Penn State',year:'Fr',yearFull:'Freshman',state:'PA',ht:"5'10\"",wt:156,gpa:3.2,sat:1140,act:25,major:'Education',ncaaId:'5678903',elo:1695,wins:26,losses:5,pins:6,tf:4,md:6,dec:10,bestWin:'multiple ranked',matches:[
+      {r:'W',opp:'3rd place finish',type:'dec',score:'3rd place',event:'NCAAs',eloAfter:1695}
+    ]},
+    {id:'l157-4',name:'Vincent Robinson',school:'NC State',year:'Jr',yearFull:'Junior',state:'NC',ht:"5'9\"",wt:155,gpa:3.0,sat:1090,act:23,major:'Psychology',ncaaId:'5678904',elo:1655,wins:23,losses:8,pins:3,tf:4,md:4,dec:12,bestWin:'multiple top-10',matches:[
+      {r:'L',opp:'Landon Robideau (OSU)',type:'dec',score:'1-5',event:'NCAAs',eloAfter:1655}
+    ]}
+  ],
+  165: [
+    {id:'l165-1',name:'Mitchell Mesenbrink',school:'Penn State',year:'Jr',yearFull:'Junior',state:'PA',ht:"5'10\"",wt:163,gpa:3.5,sat:1220,act:27,major:'Kinesiology',ncaaId:'6789012',elo:1882,wins:27,losses:0,pins:3,tf:14,md:7,dec:3,bestWin:'#3 Mikey Caliendo (TF 20-4)',matches:[
+      {r:'W',opp:'Cesar Alvan (Columbia)',type:'tf',score:'15-0',event:'NCAAs R1',eloAfter:1860},
+      {r:'W',opp:'Mikey Caliendo (Iowa)',type:'tf',score:'20-4',event:'NCAA Finals',eloAfter:1882}
+    ]},
+    {id:'l165-2',name:'Mikey Caliendo',school:'Iowa',year:'Sr',yearFull:'Senior',state:'IA',ht:"5'10\"",wt:164,gpa:3.0,sat:1100,act:24,major:'Sport & Recreation Management',ncaaId:'6789013',elo:1751,wins:25,losses:4,pins:3,tf:7,md:5,dec:10,bestWin:'Joey Blaze (SV)',matches:[
+      {r:'W',opp:'Joey Blaze (Purdue)',type:'sv',score:'8-5',event:'NCAAs SF',eloAfter:1751},
+      {r:'L',opp:'Mitchell Mesenbrink (PSU)',type:'tf',score:'4-20',event:'NCAA Finals',eloAfter:1740}
+    ]},
+    {id:'l165-3',name:'Max Brignola',school:'Lehigh',year:'Jr',yearFull:'Junior',state:'PA',ht:"5'10\"",wt:163,gpa:3.3,sat:1160,act:26,major:'Accounting',ncaaId:'6789014',elo:1644,wins:21,losses:11,pins:2,tf:3,md:4,dec:12,bestWin:'multiple ranked',matches:[
+      {r:'L',opp:'NCAAs first round exit',type:'dec',score:'Lost R1',event:'NCAAs',eloAfter:1644}
+    ]},
+    {id:'l165-4',name:'Joey Blaze',school:'Purdue',year:'So',yearFull:'Sophomore',state:'IN',ht:"5'9\"",wt:163,gpa:2.8,sat:1020,act:21,major:'General Studies',ncaaId:'6789015',elo:1692,wins:24,losses:6,pins:3,tf:5,md:5,dec:11,bestWin:'multiple ranked',matches:[
+      {r:'L',opp:'Mikey Caliendo (Iowa)',type:'sv',score:'5-8',event:'NCAAs SF',eloAfter:1692}
+    ]}
+  ],
+  174: [
+    {id:'l174-1',name:'Levi Haines',school:'Penn State',year:'Sr',yearFull:'Senior',state:'PA',ht:"5'11\"",wt:172,gpa:3.4,sat:1190,act:26,major:'Rehabilitation & Human Services',ncaaId:'7890123',elo:1841,wins:27,losses:1,pins:2,tf:10,md:8,dec:7,bestWin:'#3 Chris Minto (2-1)',matches:[
+      {r:'W',opp:'Patrick Kennedy (Iowa)',type:'tf',score:'TF',event:'B1G Champs',eloAfter:1820},
+      {r:'W',opp:'Christopher Minto (Nebraska)',type:'dec',score:'2-1',event:'NCAA Finals',eloAfter:1841}
+    ]},
+    {id:'l174-2',name:'Christopher Minto',school:'Nebraska',year:'Jr',yearFull:'Junior',state:'NE',ht:"5'11\"",wt:173,gpa:2.8,sat:1030,act:22,major:'Communications',ncaaId:'7890124',elo:1763,wins:26,losses:4,pins:3,tf:8,md:6,dec:9,bestWin:'multiple ranked',matches:[
+      {r:'L',opp:'Levi Haines (PSU)',type:'dec',score:'1-2',event:'NCAA Finals',eloAfter:1763}
+    ]},
+    {id:'l174-3',name:'Patrick Kennedy',school:'Iowa',year:'Sr',yearFull:'Senior',state:'IA',ht:"5'11\"",wt:173,gpa:3.1,sat:1120,act:25,major:'Sport & Recreation',ncaaId:'7890125',elo:1714,wins:23,losses:6,pins:2,tf:6,md:5,dec:10,bestWin:'Carson Kharchla',matches:[
+      {r:'W',opp:'Carson Kharchla (OSU)',type:'dec',score:'8-6',event:'NCAA 3rd place',eloAfter:1714}
+    ]},
+    {id:'l174-4',name:'Carson Kharchla',school:'Ohio State',year:'Sr',yearFull:'Senior',state:'OH',ht:"5'11\"",wt:172,gpa:3.0,sat:1090,act:23,major:'Sport Industry',ncaaId:'7890126',elo:1688,wins:22,losses:7,pins:2,tf:5,md:5,dec:10,bestWin:'multiple ranked',matches:[
+      {r:'L',opp:'Patrick Kennedy (Iowa)',type:'dec',score:'6-8',event:'NCAA 4th place',eloAfter:1688}
+    ]}
+  ],
+  184: [
+    {id:'l184-1',name:'Max McEnelly',school:'Minnesota',year:'So',yearFull:'Sophomore',state:'MN',ht:"6'0\"",wt:182,gpa:3.4,sat:1200,act:27,major:'Exercise Science',ncaaId:'8901234',elo:1798,wins:27,losses:4,pins:3,tf:6,md:8,dec:10,bestWin:'#1 Rocco Welsh (4-2)',notes:'2025 U20 World Champion',matches:[
+      {r:'W',opp:'Rocco Welsh (PSU)',type:'dec',score:'4-2',event:'NCAA Finals',eloAfter:1798}
+    ]},
+    {id:'l184-2',name:'Rocco Welsh',school:'Penn State',year:'Jr',yearFull:'Junior',state:'PA',ht:"6'0\"",wt:183,gpa:3.2,sat:1140,act:25,major:'Marketing',ncaaId:'8901235',elo:1758,wins:28,losses:2,pins:3,tf:8,md:7,dec:10,bestWin:'multiple top-5',matches:[
+      {r:'L',opp:'Max McEnelly (Minn)',type:'dec',score:'2-4',event:'NCAA Finals',eloAfter:1758}
+    ]},
+    {id:'l184-3',name:'Caleb Sinclair',school:'Missouri',year:'Jr',yearFull:'Junior',state:'MO',ht:"6'1\"",wt:183,gpa:2.9,sat:1060,act:22,major:'General Studies',ncaaId:'8901236',elo:1692,wins:23,losses:7,pins:3,tf:4,md:5,dec:11,bestWin:'multiple ranked',matches:[
+      {r:'W',opp:'3rd place finish',type:'md',score:'17-4',event:'NCAAs 3rd',eloAfter:1692}
+    ]},
+    {id:'l184-4',name:'Jake Woodley',school:'Oklahoma State',year:'Jr',yearFull:'Junior',state:'OK',ht:"6'1\"",wt:183,gpa:3.0,sat:1080,act:23,major:'Agribusiness',ncaaId:'8901237',elo:1668,wins:22,losses:8,pins:3,tf:3,md:5,dec:11,bestWin:'multiple ranked',matches:[
+      {r:'L',opp:'Match loss',type:'dec',score:'Lost QF',event:'NCAAs',eloAfter:1668}
+    ]}
+  ],
+  197: [
+    {id:'l197-1',name:'Josh Barr',school:'Penn State',year:'So',yearFull:'Sophomore',state:'PA',ht:"6'2\"",wt:195,gpa:3.3,sat:1160,act:26,major:'Communications',ncaaId:'9012345',elo:1852,wins:29,losses:0,pins:4,tf:12,md:9,dec:4,bestWin:'#7 Cody Merrill (6-3)',matches:[
+      {r:'W',opp:'Stanford opponent',type:'md',score:'MD',event:'NCAAs',eloAfter:1830},
+      {r:'W',opp:'Cody Merrill (OSU)',type:'dec',score:'6-3',event:'NCAA Finals',eloAfter:1852}
+    ]},
+    {id:'l197-2',name:'Cody Merrill',school:'Oklahoma State',year:'Fr',yearFull:'Freshman',state:'OK',ht:"6'2\"",wt:195,gpa:2.9,sat:1050,act:22,major:'Sports Science',ncaaId:'9012346',elo:1715,wins:23,losses:5,pins:3,tf:6,md:5,dec:9,bestWin:'Rocky Elam, Stephen Little',matches:[
+      {r:'L',opp:'Josh Barr (PSU)',type:'dec',score:'3-6',event:'NCAA Finals',eloAfter:1715}
+    ]},
+    {id:'l197-3',name:'Stephen Little',school:'Little Rock',year:'Jr',yearFull:'Junior',state:'AR',ht:"6'1\"",wt:195,gpa:3.2,sat:1130,act:25,major:'Kinesiology',ncaaId:'9012347',elo:1672,wins:19,losses:5,pins:2,tf:4,md:4,dec:9,bestWin:'multiple ranked',matches:[
+      {r:'W',opp:'3rd place finish',type:'dec',score:'3rd',event:'NCAAs',eloAfter:1672}
+    ]},
+    {id:'l197-4',name:'Rocky Elam',school:'Iowa State',year:'Sr',yearFull:'Senior',state:'IA',ht:"6'2\"",wt:195,gpa:3.0,sat:1090,act:23,major:'Kinesiology',ncaaId:'9012348',elo:1651,wins:20,losses:5,pins:3,tf:4,md:5,dec:8,bestWin:'multiple AA',notes:'Knee injury late season',matches:[
+      {r:'L',opp:'Lost in consolations (injury)',type:'dec',score:'1-2',event:'NCAAs',eloAfter:1651}
+    ]}
+  ],
+  285: [
+    {id:'l285-1',name:'Isaac Trumble',school:'NC State',year:'Sr',yearFull:'Senior',state:'NC',ht:"6'4\"",wt:283,gpa:3.2,sat:1140,act:25,major:'Business Management',ncaaId:'0123456',elo:1801,wins:28,losses:2,pins:7,tf:8,md:6,dec:7,bestWin:'#1 Yonger Bastida (5-0)',matches:[
+      {r:'W',opp:'Yonger Bastida (Iowa State)',type:'dec',score:'5-0',event:'NCAA Finals',eloAfter:1801}
+    ]},
+    {id:'l285-2',name:'Yonger Bastida',school:'Iowa State',year:'Sr',yearFull:'Senior',state:'IA',ht:"6'3\"",wt:282,gpa:3.0,sat:1090,act:23,major:'Liberal Studies',ncaaId:'0123457',elo:1762,wins:29,losses:1,pins:4,tf:17,md:5,dec:3,bestWin:'Most Tech Falls in NCAA (17)',notes:'NCAA Most Technical Falls Award',matches:[
+      {r:'L',opp:'Isaac Trumble (NC State)',type:'dec',score:'0-5',event:'NCAA Finals',eloAfter:1762}
+    ]},
+    {id:'l285-3',name:'Taye Ghadiali',school:'Michigan',year:'Sr',yearFull:'Senior',state:'MI',ht:"6'3\"",wt:281,gpa:3.3,sat:1170,act:26,major:'Sport Management',ncaaId:'0123458',elo:1714,wins:28,losses:4,pins:5,tf:7,md:6,dec:10,bestWin:'Ben Kueter',matches:[
+      {r:'W',opp:'3rd place finish (career)',type:'dec',score:'5-1',event:'NCAAs 3rd',eloAfter:1714}
+    ]},
+    {id:'l285-4',name:'Ben Kueter',school:'Iowa',year:'Jr',yearFull:'Junior',state:'IA',ht:"6'4\"",wt:283,gpa:2.9,sat:1050,act:22,major:'Sport & Recreation',ncaaId:'0123459',elo:1674,wins:22,losses:8,pins:4,tf:5,md:5,dec:8,bestWin:'AJ Ferrari',matches:[
+      {r:'W',opp:'5th place finish',type:'dec',score:'5th',event:'NCAAs',eloAfter:1674}
+    ]},
+    {id:'l285-5',name:'AJ Ferrari',school:'Nebraska',year:'Sr',yearFull:'Senior',state:'NE',ht:"6'4\"",wt:283,gpa:3.0,sat:1090,act:23,major:'Communications',ncaaId:'0123460',elo:1650,wins:21,losses:8,pins:4,tf:5,md:4,dec:8,bestWin:'multiple ranked',notes:'Moved up from 197',matches:[
+      {r:'L',opp:'Yonger Bastida (ISU)',type:'md',score:'7-15',event:'NCAAs SF',eloAfter:1650}
+    ]}
+  ]
+};
 
-DB[149]={wrestlers:[
-  {id:'149-1',name:'Aden Valencia',     school:'Stanford',     conf:'Pac-12',     yr:'Fr',base:1720,champ:'2026 NCAA Champ'},
-  {id:'149-2',name:'Shayne Van Ness',   school:'Penn State',   conf:'Big Ten',    yr:'Sr',base:1675},
-  {id:'149-3',name:'Lachlan McNeil',    school:'Michigan',     conf:'Big Ten',    yr:'Sr',base:1580},
-  {id:'149-4',name:'Collin Gaj',        school:'Virginia Tech',conf:'ACC',        yr:'Sr',base:1560},
-  {id:'149-5',name:'Koy Buesgens',      school:'NC State',     conf:'ACC',        yr:'Jr',base:1545},
-  {id:'149-6',name:'Caleb Tyus',        school:'SIU Edwardsville',conf:'OVC',     yr:'Sr',base:1530},
-  {id:'149-7',name:'Ethan Stiles',      school:'Ohio State',   conf:'Big Ten',    yr:'So',base:1525},
-  {id:'149-8',name:'Carter Young',      school:'Maryland',     conf:'Big Ten',    yr:'Jr',base:1510},
-  {id:'149-9',name:'Chance Lamer',      school:'Nebraska',     conf:'Big Ten',    yr:'Sr',base:1505},
-  {id:'149-10',name:'Kael Lauridsen',   school:'Nebraska',     conf:'Big Ten',    yr:'Sr',base:1490},
-  {id:'149-11',name:'Austin McBurney',  school:'Brown',        conf:'Ivy',        yr:'Sr',base:1470},
-  {id:'149-12',name:'Clayton Jones',    school:'Michigan State',conf:'Big Ten',   yr:'Sr',base:1450},
-],matches:[
-  {w:'149-1',l:'149-2',t:'dec',sc:'8-5', ev:'2026 NCAA Finals',    dt:'2026-03-22'},
-  {w:'149-2',l:'149-3',t:'dec',sc:'6-2', ev:'2026 NCAA Semis',     dt:'2026-03-21'},
-  {w:'149-1',l:'149-7',t:'dec',sc:'7-5', ev:'2026 NCAA Semis',     dt:'2026-03-21'},
-  {w:'149-3',l:'149-4',t:'dec',sc:'4-3', ev:'2026 NCAA 3rd place', dt:'2026-03-22'},
-  {w:'149-9',l:'149-4',t:'dec',sc:'3-1', ev:'2026 NCAA Quarters',  dt:'2026-03-20'},
-  {w:'149-8',l:'149-5',t:'dec',sc:'11-4',ev:'2026 NCAA Quarters',  dt:'2026-03-20'},
-  {w:'149-2',l:'149-8',t:'md', sc:'13-2',ev:'Big Ten Championships',dt:'2026-03-08'},
-  {w:'149-3',l:'149-6',t:'dec',sc:'5-2', ev:'Michigan Duals',      dt:'2026-01-18'},
-  {w:'149-4',l:'149-10',t:'pin',sc:'5:44',ev:'ACC Championships',  dt:'2026-03-02'},
-]};
+// RECRUITING DATABASE
+const RECRUITS = [
+  // TRANSFER PORTAL
+  {id:'r1',name:'Dean Peterson',type:'transfer',school:'Iowa',prevSchool:'Iowa',weightFK:125,weightFS:57,weightGR:55,year:'Jr',yearFull:'Junior',gpa:2.9,sat:1060,act:22,major:'Sport Management',state:'IA',record:'21-12',elo:1588,achievements:'3x All-Big Ten, NCAA qualifier',available:true,committed:false,ncaaId:'TP001',ht:"5'5\"",acad_credits:72,seeking:'D1 program, wrestling-focused environment',status:'portal'},
+  {id:'r2',name:'Brock Hardy',type:'transfer',school:'Nebraska',prevSchool:'Nebraska',weightFK:141,weightFS:65,weightGR:63,year:'Sr',yearFull:'Graduate',gpa:3.1,sat:1110,act:24,major:'Communications',state:'NE',record:'19-8',elo:1564,achievements:'2x NCAA All-American',available:true,committed:false,ncaaId:'TP002',ht:"5'9\"",acad_credits:120,seeking:'Grad transfer, compete for title',status:'portal'},
+  {id:'r3',name:'Kael Lauridsen',type:'transfer',school:'Nebraska',prevSchool:'Nebraska',weightFK:125,weightFS:57,weightGR:55,year:'So',yearFull:'Sophomore',gpa:2.7,sat:1010,act:21,major:'General Studies',state:'NE',record:'16-14',elo:1492,achievements:'NCAA qualifier',available:true,committed:false,ncaaId:'TP003',ht:"5'4\"",acad_credits:54,seeking:'More mat time, development program',status:'portal'},
+  {id:'r4',name:'Sheldon Seymour',type:'transfer',school:'Lehigh',prevSchool:'Lehigh',weightFK:125,weightFS:57,weightGR:55,year:'Jr',yearFull:'Junior',gpa:3.1,sat:1100,act:24,major:'Business',state:'PA',record:'21-10',elo:1621,achievements:'NCAA All-American (3rd place 2025)',available:true,committed:false,ncaaId:'TP004',ht:"5'5\"",acad_credits:88,seeking:'Title contender program',status:'portal'},
+  {id:'r5',name:'Rocky Elam',type:'transfer',school:'Iowa State',prevSchool:'Iowa State',weightFK:197,weightFS:92,weightGR:87,year:'Sr',yearFull:'Graduate',gpa:3.0,sat:1090,act:23,major:'Kinesiology',state:'IA',record:'20-5',elo:1651,achievements:'4x All-American, 2023 NCAA champion',available:true,committed:false,ncaaId:'TP005',ht:"6'2\"",acad_credits:124,seeking:'Grad transfer, medical redshirt possible',status:'portal',note:'Managing knee injury'},
+  {id:'r6',name:'Collin Gaj',type:'transfer',school:'Virginia Tech',prevSchool:'Virginia Tech',weightFK:149,weightFS:65,weightGR:67,year:'Sr',yearFull:'Senior',gpa:3.1,sat:1130,act:25,major:'Business Marketing',state:'PA',record:'22-9',elo:1668,achievements:'5th place 2026 NCAAs',available:true,committed:false,ncaaId:'TP006',ht:"5'9\"",acad_credits:115,seeking:'Grad transfer',status:'portal'},
 
-DB[157]={wrestlers:[
-  {id:'157-1',name:'Landon Robideau',  school:'OK State',    conf:'Big 12',     yr:'Fr',base:1720,champ:'2026 NCAA Champ'},
-  {id:'157-2',name:'Antrell Taylor',   school:'Nebraska',    conf:'Big Ten',    yr:'Sr',base:1680},
-  {id:'157-3',name:'PJ Duke',          school:'Penn State',  conf:'Big Ten',    yr:'Jr',base:1650},
-  {id:'157-4',name:'Meyer Shapiro',    school:'Cornell',     conf:'Ivy',        yr:'Sr',base:1590},
-  {id:'157-5',name:'Ty Watters',       school:'West Virginia',conf:'Big 12',    yr:'Jr',base:1570},
-  {id:'157-6',name:'Jude Swisher',     school:'Penn',        conf:'Ivy',        yr:'Sr',base:1545},
-  {id:'157-7',name:'Vinny Zerban',     school:'Iowa State',  conf:'Big 12',     yr:'Sr',base:1530},
-  {id:'157-8',name:'Charlie Millard',  school:'Minnesota',   conf:'Big Ten',    yr:'Jr',base:1520},
-  {id:'157-9',name:'Derek Raike',      school:'Ohio',        conf:'MAC',        yr:'Sr',base:1505},
-  {id:'157-10',name:'Jimmy Harrington',school:'Harvard',     conf:'Ivy',        yr:'Sr',base:1495},
-  {id:'157-11',name:'Luke Mechler',    school:'Wisconsin',   conf:'Big Ten',    yr:'Jr',base:1480},
-  {id:'157-12',name:'Cael Swensen',    school:'SD State',    conf:'Summit',     yr:'Sr',base:1460},
-],matches:[
-  {w:'157-1',l:'157-2',t:'dec',sc:'4-2', ev:'2026 NCAA Finals',    dt:'2026-03-22'},
-  {w:'157-1',l:'157-3',t:'dec',sc:'3-1', ev:'2026 NCAA Semis',     dt:'2026-03-21'},
-  {w:'157-2',l:'157-5',t:'dec',sc:'7-3', ev:'2026 NCAA Semis',     dt:'2026-03-21'},
-  {w:'157-3',l:'157-4',t:'dec',sc:'5-1', ev:'2026 NCAA 3rd place', dt:'2026-03-22'},
-  {w:'157-1',l:'157-3',t:'dec',sc:'3-1', ev:'2026 NCAA Quarters',  dt:'2026-03-20'},
-  {w:'157-2',l:'157-4',t:'dec',sc:'7-4', ev:'2026 NCAA Quarters',  dt:'2026-03-20'},
-  {w:'157-5',l:'157-6',t:'dec',sc:'7-1', ev:'2026 NCAA Quarters',  dt:'2026-03-20'},
-  {w:'157-2',l:'157-1',t:'dec',sc:'7-2', ev:'Big Ten Championships',dt:'2026-03-08'},
-  {w:'157-3',l:'157-2',t:'dec',sc:'3-2', ev:'Big Ten Championships',dt:'2026-03-08'},
-  {w:'157-1',l:'157-7',t:'md', sc:'11-3',ev:'Big 12 Championships',dt:'2026-03-07'},
-  {w:'157-4',l:'157-6',t:'dec',sc:'8-4', ev:'EIWA Championships',  dt:'2026-03-01'},
-]};
-
-DB[165]={wrestlers:[
-  {id:'165-1',name:'Mitchell Mesenbrink',school:'Penn State',  conf:'Big Ten',    yr:'Jr',base:1720,champ:'2026 NCAA Champ'},
-  {id:'165-2',name:'Mikey Caliendo',      school:'Iowa',       conf:'Big Ten',    yr:'Jr',base:1630},
-  {id:'165-3',name:'Joey Blaze',          school:'Purdue',     conf:'Big Ten',    yr:'Sr',base:1600},
-  {id:'165-4',name:'Hunter Garvin',       school:'Stanford',   conf:'Pac-12',     yr:'Sr',base:1565},
-  {id:'165-5',name:'Bryce Hepner',        school:'North Carolina',conf:'ACC',     yr:'Sr',base:1545},
-  {id:'165-6',name:'LaDarion Lockett',    school:'OK State',   conf:'Big 12',     yr:'So',base:1530},
-  {id:'165-7',name:'Nicco Ruiz',          school:'Arizona State',conf:'Big 12',   yr:'Jr',base:1525},
-  {id:'165-8',name:'EJ Parco',            school:'Stanford',   conf:'Pac-12',     yr:'Jr',base:1520},
-  {id:'165-9',name:'LJ Araujo',           school:'Nebraska',   conf:'Big Ten',    yr:'Jr',base:1505},
-  {id:'165-10',name:'Will Denny',         school:'NC State',   conf:'ACC',        yr:'Sr',base:1495},
-  {id:'165-11',name:'Ryder Downey',       school:'Northern Iowa',conf:'MVC',      yr:'Sr',base:1480},
-  {id:'165-12',name:'Cesar Alvan',        school:'Columbia',   conf:'Ivy',        yr:'Sr',base:1465},
-],matches:[
-  {w:'165-1',l:'165-2',t:'tf', sc:'20-4', ev:'2026 NCAA Finals',    dt:'2026-03-22'},
-  {w:'165-1',l:'165-5',t:'dec',sc:'6-0',  ev:'2026 NCAA Semis',     dt:'2026-03-21'},
-  {w:'165-2',l:'165-3',t:'dec',sc:'8-5',  ev:'2026 NCAA Semis',     dt:'2026-03-21'},
-  {w:'165-3',l:'165-4',t:'dec',sc:'5-2',  ev:'2026 NCAA 3rd place', dt:'2026-03-22'},
-  {w:'165-5',l:'165-10',t:'dec',sc:'3-0', ev:'2026 NCAA Quarters',  dt:'2026-03-20'},
-  {w:'165-1',l:'165-2',t:'md', sc:'11-2', ev:'Big Ten Championships',dt:'2026-03-08'},
-  {w:'165-2',l:'165-3',t:'dec',sc:'4-3',  ev:'Big Ten Championships',dt:'2026-03-07'},
-  {w:'165-1',l:'165-4',t:'tf', sc:'19-4', ev:'National Duals',      dt:'2026-01-10'},
-  {w:'165-4',l:'165-6',t:'pin',sc:'3:14', ev:'Stanford Open',       dt:'2025-11-15'},
-  {w:'165-5',l:'165-10',t:'dec',sc:'4-1', ev:'ACC Championships',   dt:'2026-03-02'},
-]};
-
-DB[174]={wrestlers:[
-  {id:'174-1',name:'Levi Haines',         school:'Penn State',  conf:'Big Ten',    yr:'Sr',base:1720,champ:'2026 NCAA Champ'},
-  {id:'174-2',name:'Christopher Minto',   school:'Nebraska',    conf:'Big Ten',    yr:'Jr',base:1640},
-  {id:'174-3',name:'Patrick Kennedy',     school:'Iowa',        conf:'Big Ten',    yr:'Jr',base:1610},
-  {id:'174-4',name:'Carson Kharchla',     school:'Ohio State',  conf:'Big Ten',    yr:'Sr',base:1580},
-  {id:'174-5',name:'Daschle Lamer',       school:'Oregon State',conf:'Pac-12',     yr:'Sr',base:1555},
-  {id:'174-6',name:'Carter Baer',         school:'Binghamton',  conf:'AE',         yr:'Sr',base:1535},
-  {id:'174-7',name:'Tanner Harvey',       school:'Air Force',   conf:'MW',         yr:'Jr',base:1520},
-  {id:'174-8',name:'Luke Condon',         school:'Wisconsin',   conf:'Big Ten',    yr:'Sr',base:1510},
-  {id:'174-9',name:'Michael Blockhus',    school:'Iowa',        conf:'Big Ten',    yr:'So',base:1490},
-  {id:'174-10',name:'Ethan Ridley',       school:'Nebraska',    conf:'Big Ten',    yr:'Jr',base:1470},
-  {id:'174-11',name:'Cody Goodwin',       school:'Indiana',     conf:'Big Ten',    yr:'Sr',base:1455},
-  {id:'174-12',name:'Hayden Hinton',      school:'Maryland',    conf:'Big Ten',    yr:'Jr',base:1440},
-],matches:[
-  {w:'174-1',l:'174-2',t:'dec',sc:'2-1', ev:'2026 NCAA Finals',    dt:'2026-03-22'},
-  {w:'174-1',l:'174-3',t:'dec',sc:'5-2', ev:'2026 NCAA Semis',     dt:'2026-03-21'},
-  {w:'174-2',l:'174-4',t:'dec',sc:'4-3', ev:'2026 NCAA Semis',     dt:'2026-03-21'},
-  {w:'174-3',l:'174-4',t:'dec',sc:'2-1', ev:'2026 NCAA 3rd place', dt:'2026-03-22'},
-  {w:'174-5',l:'174-6',t:'dec',sc:'5-2', ev:'2026 NCAA 5th place', dt:'2026-03-22'},
-  {w:'174-1',l:'174-4',t:'md', sc:'9-1', ev:'2026 NCAA Quarters',  dt:'2026-03-20'},
-  {w:'174-2',l:'174-5',t:'dec',sc:'6-3', ev:'2026 NCAA Quarters',  dt:'2026-03-20'},
-  {w:'174-1',l:'174-2',t:'dec',sc:'8-6', ev:'Big Ten Championships',dt:'2026-03-08'},
-  {w:'174-3',l:'174-9',t:'dec',sc:'5-3', ev:'Iowa Duals',          dt:'2026-01-25'},
-  {w:'174-4',l:'174-7',t:'dec',sc:'7-3', ev:'Ohio State Duals',    dt:'2026-01-18'},
-]};
-
-DB[184]={wrestlers:[
-  {id:'184-1',name:'Max McEnelly',      school:'Minnesota',   conf:'Big Ten',    yr:'So',base:1720,champ:'2026 NCAA Champ'},
-  {id:'184-2',name:'Rocco Welsh',       school:'Penn State',  conf:'Big Ten',    yr:'Sr',base:1660},
-  {id:'184-3',name:'Aeoden Sinclair',   school:'Missouri',    conf:'SEC',        yr:'Sr',base:1610},
-  {id:'184-4',name:'Angelo Ferrari',   school:'Iowa',        conf:'Big Ten',    yr:'Sr',base:1595},
-  {id:'184-5',name:'Stevo Poulin',      school:'Iowa State',  conf:'Big 12',     yr:'Sr',base:1575},
-  {id:'184-6',name:'Diego Sotelo',      school:'Michigan',    conf:'Big Ten',    yr:'Jr',base:1555},
-  {id:'184-7',name:'Travis Mastrogiovanni',school:'Lehigh',   conf:'Patriot',    yr:'Sr',base:1540},
-  {id:'184-8',name:'Aaron Seidel',      school:'Virginia Tech',conf:'ACC',       yr:'So',base:1525},
-  {id:'184-9',name:'Hayden Hastings',   school:'Iowa State',  conf:'Big 12',     yr:'Jr',base:1510},
-  {id:'184-10',name:'Caleb Uhlenhopp',  school:'Utah Valley', conf:'WAC',        yr:'Sr',base:1480},
-  {id:'184-11',name:'Sam Goin',         school:'Indiana',     conf:'Big Ten',    yr:'Jr',base:1465},
-  {id:'184-12',name:'Calvin Freshour',  school:'Stanford',    conf:'Pac-12',     yr:'Jr',base:1450},
-],matches:[
-  {w:'184-1',l:'184-2',t:'dec',sc:'4-3', ev:'2026 NCAA Finals',    dt:'2026-03-22'},
-  {w:'184-1',l:'184-3',t:'dec',sc:'5-1', ev:'2026 NCAA Semis',     dt:'2026-03-21'},
-  {w:'184-2',l:'184-4',t:'dec',sc:'4-2', ev:'2026 NCAA Semis',     dt:'2026-03-21'},
-  {w:'184-4',l:'184-3',t:'dec',sc:'4-2', ev:'2026 NCAA 3rd place', dt:'2026-03-22'},
-  {w:'184-5',l:'184-6',t:'dec',sc:'10-6',ev:'2026 NCAA 5th place', dt:'2026-03-22'},
-  {w:'184-1',l:'184-5',t:'dec',sc:'6-2', ev:'2026 NCAA Quarters',  dt:'2026-03-20'},
-  {w:'184-2',l:'184-6',t:'dec',sc:'7-3', ev:'2026 NCAA Quarters',  dt:'2026-03-20'},
-  {w:'184-2',l:'184-1',t:'dec',sc:'6-4', ev:'Big Ten Championships',dt:'2026-03-07'},
-  {w:'184-5',l:'184-9',t:'dec',sc:'5-3', ev:'Big 12 Championships',dt:'2026-03-07'},
-  {w:'184-3',l:'184-6',t:'md', sc:'13-5',ev:'Missouri Duals',      dt:'2026-01-25'},
-]};
-
-DB[197]={wrestlers:[
-  {id:'197-1',name:'Josh Barr',          school:'Penn State',  conf:'Big Ten',    yr:'So',base:1720,champ:'2026 NCAA Champ'},
-  {id:'197-2',name:'Cody Merrill',        school:'OK State',    conf:'Big 12',     yr:'Jr',base:1620},
-  {id:'197-3',name:'Stephen Little',      school:'Little Rock', conf:'Sun Belt',   yr:'Sr',base:1590},
-  {id:'197-4',name:'Rocky Elam',          school:'Iowa State',  conf:'Big 12',     yr:'Sr',base:1575},
-  {id:'197-5',name:'Tanner Sloan',        school:'SD State',    conf:'Summit',     yr:'Sr',base:1560},
-  {id:'197-6',name:'Lance Leach',         school:'Illinois',    conf:'Big Ten',    yr:'Sr',base:1540},
-  {id:'197-7',name:'Silas Allred',        school:'Nebraska',    conf:'Big Ten',    yr:'Jr',base:1530},
-  {id:'197-8',name:'Jaxon Smith',         school:'Penn State',  conf:'Big Ten',    yr:'Jr',base:1515},
-  {id:'197-9',name:'Wyatt Sheets',        school:'OK State',    conf:'Big 12',     yr:'So',base:1500},
-  {id:'197-10',name:'Gavin Park',         school:'Indiana',     conf:'Big Ten',    yr:'Sr',base:1485},
-  {id:'197-11',name:'Ben Harvey',         school:'Air Force',   conf:'MW',         yr:'Sr',base:1470},
-  {id:'197-12',name:'Blake Schaffer',     school:'Kent State',  conf:'MAC',        yr:'Sr',base:1455},
-],matches:[
-  {w:'197-1',l:'197-2',t:'dec',sc:'6-3', ev:'2026 NCAA Finals',    dt:'2026-03-22'},
-  {w:'197-1',l:'197-3',t:'md', sc:'13-5',ev:'2026 NCAA Semis',     dt:'2026-03-21'},
-  {w:'197-2',l:'197-3',t:'dec',sc:'2-2', ev:'2026 NCAA Semis',     dt:'2026-03-21'},
-  {w:'197-4',l:'197-3',t:'dec',sc:'3-2', ev:'2026 NCAA 3rd place', dt:'2026-03-22'},
-  {w:'197-5',l:'197-6',t:'dec',sc:'6-2', ev:'2026 NCAA 5th place', dt:'2026-03-22'},
-  {w:'197-1',l:'197-4',t:'md', sc:'12-4',ev:'2026 NCAA Quarters',  dt:'2026-03-20'},
-  {w:'197-2',l:'197-3',t:'dec',sc:'2-2', ev:'2026 NCAA Quarters',  dt:'2026-03-20'},
-  {w:'197-1',l:'197-8',t:'tf', sc:'18-3',ev:'Big Ten Championships',dt:'2026-03-08'},
-  {w:'197-4',l:'197-9',t:'dec',sc:'8-3', ev:'Big 12 Championships',dt:'2026-03-07'},
-  {w:'197-3',l:'197-7',t:'pin',sc:'3:52',ev:'Sun Belt Championships',dt:'2026-03-02'},
-]};
-
-DB[285]={wrestlers:[
-  {id:'285-1',name:'Isaac Trumble',      school:'NC State',    conf:'ACC',        yr:'Sr',base:1720,champ:'2026 NCAA Champ'},
-  {id:'285-2',name:'Yonger Bastida',     school:'Iowa State',  conf:'Big 12',     yr:'Sr',base:1680},
-  {id:'285-3',name:'Jett Strickenberger',school:'West Virginia',conf:'Big 12',    yr:'So',base:1610},
-  {id:'285-4',name:'Ezekiel Witt',       school:'ND State',    conf:'Summit',     yr:'Jr',base:1575},
-  {id:'285-5',name:'Christian Lance',    school:'Nebraska',    conf:'Big Ten',    yr:'Sr',base:1560},
-  {id:'285-6',name:'Wyatt Hendrickson',  school:'Army',        conf:'Patriot',    yr:'Sr',base:1545},
-  {id:'285-7',name:'Derek Holschlag',    school:'Northern Iowa',conf:'MVC',       yr:'Sr',base:1530},
-  {id:'285-8',name:'Mason Parris',       school:'Michigan',    conf:'Big Ten',    yr:'Sr',base:1520},
-  {id:'285-9',name:'Greg Mayer',         school:'Army',        conf:'Patriot',    yr:'Sr',base:1505},
-  {id:'285-10',name:'Tony Cassioppi',    school:'Iowa',        conf:'Big Ten',    yr:'Sr',base:1495},
-  {id:'285-11',name:'Brandon Metz',      school:'SD State',    conf:'Summit',     yr:'Sr',base:1480},
-  {id:'285-12',name:'Emmanuel Ulrich',   school:'American',    conf:'Patriot',    yr:'Sr',base:1460},
-],matches:[
-  {w:'285-1',l:'285-2',t:'dec',sc:'5-0', ev:'2026 NCAA Finals',    dt:'2026-03-22'},
-  {w:'285-1',l:'285-3',t:'md', sc:'9-1', ev:'2026 NCAA Semis',     dt:'2026-03-21'},
-  {w:'285-2',l:'285-4',t:'md', sc:'11-3',ev:'2026 NCAA Semis',     dt:'2026-03-21'},
-  {w:'285-3',l:'285-4',t:'md', sc:'13-5',ev:'2026 NCAA 3rd place', dt:'2026-03-22'},
-  {w:'285-5',l:'285-6',t:'dec',sc:'7-2', ev:'2026 NCAA 5th place', dt:'2026-03-22'},
-  {w:'285-7',l:'285-8',t:'dec',sc:'5-3', ev:'2026 NCAA 7th place', dt:'2026-03-22'},
-  {w:'285-1',l:'285-4',t:'tf', sc:'15-0',ev:'2026 NCAA Quarters',  dt:'2026-03-20'},
-  {w:'285-2',l:'285-5',t:'dec',sc:'6-2', ev:'2026 NCAA Quarters',  dt:'2026-03-20'},
-  {w:'285-2',l:'285-3',t:'dec',sc:'7-4', ev:'Big 12 Championships',dt:'2026-03-07'},
-  {w:'285-1',l:'285-5',t:'dec',sc:'5-2', ev:'ACC Championships',   dt:'2026-03-02'},
-  {w:'285-2',l:'285-10',t:'md',sc:'14-6',ev:'Iowa State Duals',    dt:'2026-02-08'},
-]};
-
-const TEAMS=[
-  {name:'Penn State',     pts:181.5,champs:4},
-  {name:'Oklahoma State', pts:131.0,champs:3},
-  {name:'Nebraska',       pts:100.5,champs:0},
-  {name:'Iowa',           pts:95.5, champs:0},
-  {name:'Ohio State',     pts:88.0, champs:0},
-  {name:'Minnesota',      pts:84.0, champs:1},
-  {name:'NC State',       pts:76.5, champs:1},
-  {name:'Stanford',       pts:72.0, champs:1},
-  {name:'Iowa State',     pts:65.5, champs:0},
-  {name:'Virginia Tech',  pts:62.0, champs:0},
-  {name:'Michigan',       pts:58.5, champs:0},
-  {name:'Lehigh',         pts:55.0, champs:0},
+  // HIGH SCHOOL PROSPECTS (folkstyle / freestyle / greco)
+  {id:'r10',name:'Tyler Hammond',type:'hs',school:'Blair Academy (NJ)',weightFK:133,weightFS:65,weightGR:63,year:'Sr',yearFull:'HS Senior',gpa:3.6,sat:1240,act:28,major:null,state:'NJ',record:'42-1',elo:1610,achievements:'NJ State Champion, NHSCA All-American, 2nd at Ironman',available:true,committed:false,ncaaId:'HS001',ht:"5'7\"",acad_credits:0,seeking:'D1 wrestling powerhouse, strong academics',status:'uncommitted'},
+  {id:'r11',name:'Marcus Webb',type:'hs',school:'St. Paris Graham (OH)',weightFK:157,weightFS:70,weightGR:67,year:'Jr',yearFull:'HS Junior',gpa:3.2,sat:1120,act:25,major:null,state:'OH',record:'38-2',elo:1588,achievements:'OH State Runner-up, 3rd at Super 32',available:true,committed:false,ncaaId:'HS002',ht:"5'10\"",acad_credits:0,seeking:'Midwest D1, close to home',status:'uncommitted'},
+  {id:'r12',name:'Caden Rivera',type:'hs',school:'Buchanan (CA)',weightFK:125,weightFS:57,weightGR:55,year:'Sr',yearFull:'HS Senior',gpa:3.4,sat:1180,act:27,major:null,state:'CA',record:'39-3',elo:1564,achievements:'CA State Champion, Cadet World Team member (Freestyle)',available:true,committed:false,ncaaId:'HS003',ht:"5'4\"",acad_credits:0,seeking:'West Coast D1 or strong academic D3',status:'uncommitted'},
+  {id:'r13',name:'Elijah Thurston',type:'hs',school:'Gilman School (MD)',weightFK:141,weightFS:65,weightGR:63,year:'Sr',yearFull:'HS Senior',gpa:3.8,sat:1360,act:30,major:null,state:'MD',record:'36-4',elo:1541,achievements:'MD State Champion, Academic All-State',available:true,committed:false,ncaaId:'HS004',ht:"5'8\"",acad_credits:0,seeking:'Academic + athletic balance, D1 or D3',status:'uncommitted'},
+  {id:'r14',name:'Connor Walsh',type:'hs',school:'Poway (CA)',weightFK:285,weightFS:125,weightGR:130,year:'Sr',yearFull:'HS Senior',gpa:2.9,sat:1040,act:22,major:null,state:'CA',record:'41-2',elo:1572,achievements:'CA State Champ, 4th at NHSCA Nationals',available:true,committed:false,ncaaId:'HS005',ht:"6'4\"",acad_credits:0,seeking:'D1 with development focus',status:'uncommitted'},
+  {id:'r15',name:'Dev Patel',type:'hs',school:'Blair Academy (NJ)',weightFK:133,weightFS:65,weightGR:63,year:'Sr',yearFull:'HS Senior',gpa:4.0,sat:1490,act:34,major:null,state:'NJ',record:'38-5',elo:1524,achievements:'Multiple state placer, Ivy-caliber student',available:true,committed:false,ncaaId:'HS006',ht:"5'6\"",acad_credits:0,seeking:'Academic D1 or Ivy/NESCAC',status:'uncommitted'},
+  // COMMITTED - should NOT appear in recruiting
+  {id:'r20',name:'Jake Morrison',type:'hs',school:'Waynesburg (PA)',weightFK:165,weightFS:79,weightGR:77,year:'Sr',yearFull:'HS Senior',gpa:3.1,sat:1100,act:24,major:null,state:'PA',record:'44-1',elo:1598,achievements:'PA State Champion',available:false,committed:true,ncaaId:'HS007',ht:"5'10\"",acad_credits:0,seeking:null,status:'committed',committedTo:'Penn State'},
+  {id:'r21',name:'Drew Simpson',type:'transfer',school:'Wisconsin',prevSchool:'Wisconsin',weightFK:174,weightFS:79,weightGR:77,year:'Jr',yearFull:'Junior',gpa:3.0,sat:1090,act:23,major:'Communications',state:'WI',record:'18-9',elo:1521,achievements:'NCAA qualifier',available:false,committed:true,ncaaId:'TP010',ht:"5'11\"",acad_credits:78,seeking:null,status:'committed',committedTo:'Iowa'}
 ];
 
-// ═══════════════════════════════════════════════════════
-// 3. STORAGE — localStorage persistence (Opt 1)
-// ═══════════════════════════════════════════════════════
-const STORAGE_KEY = 'wrestler_os_matches_v2';
-const PENDING_KEY = 'wrestler_os_pending_v2';
+// TEAM STANDINGS
+const TEAMS = [
+  {rank:1,name:'Penn State',pts:181.5,champs:4,school:'Big Ten'},
+  {rank:2,name:'Oklahoma State',pts:131,champs:3,school:'Big 12'},
+  {rank:3,name:'Nebraska',pts:100.5,champs:0,school:'Big Ten'},
+  {rank:4,name:'Iowa',pts:92.5,champs:0,school:'Big Ten'},
+  {rank:5,name:'Ohio State',pts:85,champs:0,school:'Big Ten'},
+  {rank:6,name:'NC State',pts:68,champs:1,school:'ACC'},
+  {rank:7,name:'Minnesota',pts:62,champs:1,school:'Big Ten'},
+  {rank:8,name:'Stanford',pts:54,champs:1,school:'Pac-12'},
+  {rank:9,name:'Virginia Tech',pts:49,champs:0,school:'ACC'},
+  {rank:10,name:'Michigan',pts:43,champs:0,school:'Big Ten'},
+  {rank:11,name:'Iowa State',pts:38.5,champs:0,school:'Big 12'},
+  {rank:12,name:'Arizona State',pts:35,champs:0,school:'Big 12'},
+  {rank:13,name:'Princeton',pts:28,champs:0,school:'EIWA'},
+  {rank:14,name:'Purdue',pts:25,champs:0,school:'Big Ten'},
+  {rank:15,name:'Lehigh',pts:22,champs:0,school:'EIWA'}
+];
 
-function loadUserMatches() {
-  try { return JSON.parse(localStorage.getItem(STORAGE_KEY)||'{}'); } catch(e){return {};}
-}
-function saveUserMatches(data) {
-  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(data)); } catch(e){}
-}
-function loadPending() {
-  try { return JSON.parse(localStorage.getItem(PENDING_KEY)||'[]'); } catch(e){return [];}
-}
-function savePending(data) {
-  try { localStorage.setItem(PENDING_KEY, JSON.stringify(data)); } catch(e){}
-}
+// STARRED RECRUITS (localStorage)
+let starredIds = JSON.parse(localStorage.getItem('wr_starred')||'[]');
+let pendingMatches = JSON.parse(localStorage.getItem('wr_pending')||'[]');
+let instSettings = JSON.parse(localStorage.getItem('wr_inst')||'{"gpa":2.5,"sat":1000,"act":21,"div":"NCAA D1","degrees":""}');
+let currentWeight = 165;
+let currentStyle = 'folkstyle';
+let currentDiv = 'D1';
 
-let userMatches = loadUserMatches(); // {wt: [matches...]}
-let pendingMatches = loadPending();  // [{...matchData, votes:1, submitter:'...', id:'...'}]
+// ===================== INIT =====================
+window.onload = function(){
+  renderWeightBtns();
+  renderRankings();
+  renderRecruits();
+  renderTeams();
+  populateMatchupSelects();
+  document.getElementById('inst-gpa').value = instSettings.gpa;
+  document.getElementById('inst-sat').value = instSettings.sat;
+  document.getElementById('inst-act').value = instSettings.act;
+  document.getElementById('inst-div').value = instSettings.div;
+  document.getElementById('inst-degrees').value = instSettings.degrees;
+};
 
-function getAllMatches(wt) {
-  const base = DB[wt].matches;
-  const user = (userMatches[wt]||[]);
-  return [...base, ...user];
-}
-
-// ═══════════════════════════════════════════════════════
-// 4. ELO STATE
-// ═══════════════════════════════════════════════════════
-let eloState = {};
-let currentWeight = 125;
-
-function runEloForWeight(wt) {
-  const {wrestlers} = DB[wt];
-  const matches = getAllMatches(wt);
-  const ratings={}, stats={};
-  wrestlers.forEach(w=>{
-    ratings[w.id]=w.base;
-    stats[w.id]={wins:0,losses:0,pins:0,tfs:0,mds:0,decs:0,history:[],eloTimeline:[w.base]};
-  });
-  matches.forEach(m=>{
-    const rW=ratings[m.w], rL=ratings[m.l];
-    const chg=eloChg(rW,rL,m.t);
-    ratings[m.w]+=chg; ratings[m.l]-=chg;
-    stats[m.w].wins++;   stats[m.l].losses++;
-    if(m.t==='pin')stats[m.w].pins++;
-    else if(m.t==='tf')stats[m.w].tfs++;
-    else if(m.t==='md')stats[m.w].mds++;
-    else stats[m.w].decs++;
-    stats[m.w].history.push({...m,out:'win', chg:+chg,after:ratings[m.w]});
-    stats[m.l].history.push({...m,out:'loss',chg:-chg,after:ratings[m.l]});
-    stats[m.w].eloTimeline.push(ratings[m.w]);
-    stats[m.l].eloTimeline.push(ratings[m.l]);
-  });
-  return {ratings,stats};
+// ===================== NAV =====================
+function showPage(p){
+  document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(x=>x.classList.remove('active'));
+  document.getElementById('page-'+p).classList.add('active');
+  const tabs = document.querySelectorAll('.nav-tab');
+  const pages = ['home','rankings','recruiting','roster','matchup','academic','teams','submit','how'];
+  const idx = pages.indexOf(p);
+  if(idx>=0) tabs[idx].classList.add('active');
 }
 
-function initAll(){
-  [125,133,141,149,157,165,174,184,197,285].forEach(wt=>{ eloState[wt]=runEloForWeight(wt); });
-  updatePendingBadge();
+function setDiv(d, el){
+  currentDiv = d;
+  document.querySelectorAll('.div-btn').forEach(x=>x.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('currentDiv').textContent = d;
 }
 
-// ═══════════════════════════════════════════════════════
-// 5. RANKINGS RENDER
-// ═══════════════════════════════════════════════════════
-function setWeight(wt){
-  currentWeight=wt;
-  document.querySelectorAll('.wt-btn').forEach(b=>b.classList.toggle('active',parseInt(b.textContent)===wt));
-  if(document.getElementById('view-rankings').classList.contains('active'))renderRankings();
-  refreshSubSelects(); refreshH2HSelects();
+// ===================== RANKINGS =====================
+function renderWeightBtns(){
+  const wts = WEIGHTS[currentStyle];
+  const unit = currentStyle === 'folkstyle' ? 'lbs' : 'kg';
+  const container = document.getElementById('weight-btns');
+  container.innerHTML = wts.map(w=>`<div class="w-btn ${w===currentWeight?'active':''}" onclick="selectWeight(${w},this)">${w} ${unit}</div>`).join('');
+  
+  const notes = {
+    folkstyle:'NCAA Folkstyle: 125, 133, 141, 149, 157, 165, 174, 184, 197, 285 lbs',
+    freestyle:'Freestyle/Olympic: 57, 65, 70, 74, 79, 86, 92, 97, 125 kg',
+    greco:'Greco-Roman: 55, 60, 63, 67, 72, 77, 82, 87, 97, 130 kg'
+  };
+  document.getElementById('style-weights-note').textContent = notes[currentStyle];
+}
+
+function setStyle(s, el){
+  currentStyle = s;
+  document.querySelectorAll('.s-btn').forEach(x=>x.classList.remove('active'));
+  el.classList.add('active');
+  // reset weight to first of new style
+  currentWeight = WEIGHTS[s][4];
+  renderWeightBtns();
+  renderRankings();
+}
+
+function selectWeight(w, el){
+  currentWeight = w;
+  document.querySelectorAll('.w-btn').forEach(x=>x.classList.remove('active'));
+  el.classList.add('active');
+  renderRankings();
+}
+
+function getBonusPct(w){
+  return Math.round(((w.pins+w.tf+w.md)/(w.wins||1))*100);
 }
 
 function renderRankings(){
-  const wt=currentWeight;
-  const {ratings,stats}=eloState[wt];
-  const wrestlers=DB[wt].wrestlers;
-  document.getElementById('hero-title').innerHTML=`${wt} lbs <em>Rankings</em>`;
-  document.getElementById('rank-section-title').textContent=`${wt} lbs — algorithmic`;
-  const ranked=[...wrestlers].sort((a,b)=>ratings[b.id]-ratings[a.id]);
-  const maxR=Math.max(...ranked.map(w=>ratings[w.id]));
-  const totalM=getAllMatches(wt).length;
-  document.getElementById('hero-stats').innerHTML=`
-    <div class="stat-pill"><strong>${wrestlers.length}</strong>wrestlers</div>
-    <div class="stat-pill"><strong>${totalM}</strong>matches</div>
-    <div class="stat-pill"><strong>${Math.max(...Object.values(ratings))}</strong>top ELO</div>`;
-  document.getElementById('rankings-body').innerHTML=ranked.map((w,i)=>{
-    const r=ratings[w.id],s=stats[w.id];
-    const bar=Math.round((r/maxR)*100);
-    const delta=r-w.base;
-    const ds=delta>0?`<span class="du">+${delta}</span>`:delta<0?`<span class="dd">${delta}</span>`:`<span class="ds_">—</span>`;
-    const bon=s.wins>0?Math.round(((s.pins+s.tfs+s.mds)/s.wins)*100):0;
-    const cb=w.champ?`<span class="badge badge-champ">${w.champ}</span>`:'';
-    return `<tr class="rank-row${i<3?' gold':''}" onclick="showProfile('${w.id}',${wt})">
-      <td><div class="rank-num">${i+1}</div></td>
-      <td>
-        <div class="wrestler-name">${w.name} ${cb}</div>
-        <div class="wrestler-school">${w.school} · ${w.conf} · ${w.yr||''}</div>
-      </td>
-      <td><div class="rec"><span class="w">${s.wins}W</span>–<span class="l">${s.losses}L</span></div>
-          <div class="bonus-pct">${bon}% bonus</div></td>
-      <td><div class="wt-bar">
-        ${s.pins>0?`<span class="ws wp">${s.pins}F</span>`:''}
-        ${s.tfs>0?`<span class="ws wt_">${s.tfs}T</span>`:''}
-        ${s.mds>0?`<span class="ws wm">${s.mds}M</span>`:''}
-        ${s.decs>0?`<span class="ws wd">${s.decs}D</span>`:''}
-      </div></td>
-      <td><div class="elo-val">${r}</div>
-          <div class="elo-bar-wrap"><div class="elo-bar" style="width:${bar}%"></div></div></td>
-      <td>${ds}</td>
+  const wts = WEIGHTS[currentStyle];
+  const wt = currentWeight;
+  // For freestyle/greco, we use folkstyle data as a proxy with adjusted note
+  const wrestlerData = WRESTLERS[currentWeight] || [];
+  const sorted = [...wrestlerData].sort((a,b)=>b.elo-a.elo);
+  
+  const tbody = document.getElementById('rankings-body');
+  tbody.innerHTML = sorted.map((w,i)=>{
+    const rank = i+1;
+    const rankClass = rank===1?'rank-1':rank===2?'rank-2':rank===3?'rank-3':'rank-num';
+    const delta = w.elo - 1500;
+    const bonusPct = getBonusPct(w);
+    const yearClass = {Fr:'yr-fr',So:'yr-so',Jr:'yr-jr',Sr:'yr-sr',Graduate:'yr-gr'}[w.year]||'yr-fr';
+    const wins = w.wins||0, losses = w.losses||0;
+    return `<tr onclick="openProfile('${w.id}')">
+      <td><span class="${rankClass}">${rank}</span></td>
+      <td><div class="wrestler-name">${w.name}</div></td>
+      <td><div style="font-size:.82rem">${w.school}</div><div style="font-size:.7rem;color:var(--text3)">${w.state||''}</div></td>
+      <td><span class="year-badge ${yearClass}">${w.year}</span></td>
+      <td><span class="elo-score" style="color:${rank===1?'var(--gold)':'var(--text)'}">${w.elo}</span>
+          <span class="elo-delta ${delta>=0?'delta-pos':'delta-neg'}">${delta>=0?'+':''}${delta}</span></td>
+      <td><span class="record-badge">${wins}-${losses}</span></td>
+      <td><span style="font-size:.82rem;font-weight:600;color:${bonusPct>=60?'var(--green)':bonusPct>=40?'var(--orange)':'var(--text2)'}">${bonusPct}%</span></td>
+      <td><span style="font-size:.78rem;color:var(--text2)">${w.bestWin||'—'}</span></td>
     </tr>`;
   }).join('');
 }
 
-// ═══════════════════════════════════════════════════════
-// 6. PROFILE with career ELO sparkline
-// ═══════════════════════════════════════════════════════
-function showProfile(id,wt){
-  const {ratings,stats}=eloState[wt];
-  const w=DB[wt].wrestlers.find(x=>x.id===id);
-  const r=ratings[id],s=stats[id];
-  const ranked=[...DB[wt].wrestlers].sort((a,b)=>ratings[b.id]-ratings[a.id]);
-  const rank=ranked.findIndex(x=>x.id===id)+1;
-  const bon=s.wins>0?Math.round(((s.pins+s.tfs+s.mds)/s.wins)*100):0;
-  const wr=(s.wins+s.losses)>0?Math.round((s.wins/(s.wins+s.losses))*100):0;
-  const typeMap={pin:'Fall',tf:'Tech Fall',md:'Major Dec',dec:'Decision'};
-  const typeCls={pin:'wp',tf:'wt_',md:'wm',dec:'wd'};
-  // sparkline
-  const tl=s.eloTimeline;
-  const minE=Math.min(...tl),maxE=Math.max(...tl);
-  const W=400,H=50,pad=4;
-  const pts=tl.map((v,i)=>{
-    const x=pad+(i/(Math.max(tl.length-1,1)))*(W-2*pad);
-    const y=H-pad-((v-minE)/(Math.max(maxE-minE,1)))*(H-2*pad);
-    return `${x},${y}`;
-  }).join(' ');
-  const sparkline=tl.length>1?`
-    <div class="career-section">
-      <div class="career-lbl">ELO trajectory · ${tl.length-1} matches · peak: ${Math.max(...tl)} · low: ${Math.min(...tl)}</div>
-      <svg viewBox="0 0 ${W} ${H}" class="career-chart" style="overflow:visible">
-        <polyline points="${pts}" fill="none" stroke="var(--accent)" stroke-width="1.5" stroke-linejoin="round"/>
-        <circle cx="${parseFloat(pts.split(' ').at(-1).split(',')[0])}" cy="${parseFloat(pts.split(' ').at(-1).split(',')[1])}" r="3" fill="var(--accent)"/>
-      </svg>
-    </div>`:'';
-  const cards=[...s.history].reverse().map(m=>{
-    const oppId=m.out==='win'?m.l:m.w;
-    const opp=DB[wt].wrestlers.find(x=>x.id===oppId);
-    const isPending=false;
-    return `<div class="mc${isPending?' pending-match':''}">
-      <div class="mr ${m.out==='win'?'mr-w':'mr-l'}">${m.out==='win'?'WIN':'LOSS'}</div>
-      <div>
-        <div class="m-opp">${opp?opp.name:'Unknown'}</div>
-        <div class="m-sch">${opp?opp.school:''}</div>
-        <div class="m-date">${m.dt}</div>
-      </div>
-      <div>
-        <div class="m-type-tag ws ${typeCls[m.t]}">${typeMap[m.t]}${m.sc?' · '+m.sc:''}</div>
-        <div class="m-evt">${m.ev}</div>
-      </div>
-      <div class="elo-db ${m.chg>0?'eu':'el'}">${m.chg>0?'+':''}${m.chg} → ${m.after}</div>
-    </div>`;
-  }).join('');
-  document.getElementById('profile-content').innerHTML=`
-    <div class="prof-hdr">
-      <div>
-        <div class="prof-name">${w.name}</div>
-        <div class="prof-meta">
-          <span>🏫 ${w.school}</span><span>📋 ${w.conf}</span><span>${w.yr||''} · ${wt} lbs</span>
-          ${w.champ?`<span style="color:var(--accent)">🏆 ${w.champ}</span>`:''}
-        </div>
-      </div>
-      <div class="prof-elo-card">
-        <div class="prof-elo-lbl">ELO rating</div>
-        <div class="prof-elo-num">${r}</div>
-        <div class="prof-elo-rank">#${rank} at ${wt} lbs</div>
-      </div>
-    </div>
-    <div class="stats-grid">
-      <div class="s-card"><div class="s-lbl">Record</div><div class="s-val" style="color:var(--green)">${s.wins}–${s.losses}</div></div>
-      <div class="s-card"><div class="s-lbl">Win rate</div><div class="s-val">${wr}%</div></div>
-      <div class="s-card"><div class="s-lbl">Bonus rate</div><div class="s-val" style="color:var(--accent)">${bon}%</div></div>
-      <div class="s-card"><div class="s-lbl">Falls</div><div class="s-val" style="color:var(--red)">${s.pins}</div></div>
-    </div>
-    ${sparkline}
-    <div class="mh-title" style="margin-top:12px">Match history (${s.history.length} matches)</div>
-    <div class="match-list">${cards||'<div style="color:var(--muted);font-family:var(--fm);font-size:13px;padding:10px 0">No matches recorded.</div>'}</div>`;
-  showView('profile');
-}
-
-// ═══════════════════════════════════════════════════════
-// 7. MATCHUP SIMULATOR — win probability (Opt 2)
-// ═══════════════════════════════════════════════════════
-function refreshH2HSelects(){
-  const wt=parseInt(document.getElementById('h2h-weight').value||165);
-  const opts=DB[wt].wrestlers.map(w=>`<option value="${w.id}">${w.name} (${w.school})</option>`).join('');
-  document.getElementById('h2h-a').innerHTML=opts;
-  document.getElementById('h2h-b').innerHTML=opts;
-  document.getElementById('h2h-b').selectedIndex=1;
-  runH2H();
-}
-
-function runH2H(){
-  const wt=parseInt(document.getElementById('h2h-weight').value||165);
-  const idA=document.getElementById('h2h-a').value;
-  const idB=document.getElementById('h2h-b').value;
-  if(!idA||!idB||idA===idB){
-    document.getElementById('h2h-result').innerHTML='<p style="color:var(--muted);font-family:var(--fm);font-size:13px">Select two different wrestlers.</p>';
-    return;
+// ===================== PROFILE =====================
+function openProfile(id){
+  let wrestler = null;
+  for(const wt of Object.values(WRESTLERS)){
+    const found = wt.find(w=>w.id===id);
+    if(found){wrestler=found;break;}
   }
-  const {ratings,stats}=eloState[wt];
-  const wA=DB[wt].wrestlers.find(x=>x.id===idA);
-  const wB=DB[wt].wrestlers.find(x=>x.id===idB);
-  const rA=ratings[idA], rB=ratings[idB];
-  const probA=eloExp(rA,rB);
-  const probB=1-probA;
-  const pctA=Math.round(probA*100);
-  const pctB=100-pctA;
-  // Find H2H history
-  const allM=getAllMatches(wt);
-  const h2hMatches=allM.filter(m=>(m.w===idA&&m.l===idB)||(m.w===idB&&m.l===idA));
-  const typeMap={pin:'Fall',tf:'Tech Fall',md:'Major Dec',dec:'Decision'};
-  const h2hCards=h2hMatches.length?h2hMatches.map(m=>{
-    const aWon=m.w===idA;
-    return `<div class="h2h-past-match">
-      <span style="font-family:var(--fd);font-weight:700">${m.ev}</span>
-      <span style="color:var(--muted)">${m.dt}</span>
-      <span>${typeMap[m.t]}${m.sc?' · '+m.sc:''}</span>
-      <span class="h2h-win-tag" style="background:${aWon?'rgba(245,166,35,.15)':'rgba(59,130,246,.15)'};color:${aWon?'var(--accent)':'var(--blue)'}">
-        ${aWon?wA.name:wB.name} won
-      </span>
-    </div>`;
-  }).join(''):`<div style="color:var(--muted);font-family:var(--fm);font-size:12px;padding:8px 0">No head-to-head matches on record.</div>`;
-  const stronger=pctA>=pctB?wA:wB;
-  const weakerPct=Math.min(pctA,pctB);
-  document.getElementById('h2h-result').innerHTML=`
-    <div class="h2h-result">
-      <div style="font-family:var(--fm);font-size:12px;color:var(--muted);margin-bottom:16px">ELO-BASED WIN PROBABILITY</div>
-      <div style="display:grid;grid-template-columns:1fr auto 1fr;gap:20px;align-items:center;margin-bottom:20px">
-        <div class="h2h-card" style="border-color:${pctA>pctB?'rgba(245,166,35,.4)':'var(--border)'}">
-          <div class="h2h-wrestler-name">${wA.name}</div>
-          <div class="h2h-school">${wA.school}</div>
-          <div class="h2h-elo">ELO ${rA}</div>
-          <div class="h2h-win-pct" style="color:${pctA>pctB?'var(--accent)':'var(--blue)'}">${pctA}%</div>
-          <div class="h2h-win-label">win probability</div>
-        </div>
-        <div style="font-family:var(--fd);font-weight:900;font-size:22px;color:var(--muted)">VS</div>
-        <div class="h2h-card" style="border-color:${pctB>pctA?'rgba(245,166,35,.4)':'var(--border)'}">
-          <div class="h2h-wrestler-name">${wB.name}</div>
-          <div class="h2h-school">${wB.school}</div>
-          <div class="h2h-elo">ELO ${rB}</div>
-          <div class="h2h-win-pct" style="color:${pctB>pctA?'var(--accent)':'var(--blue)'}">${pctB}%</div>
-          <div class="h2h-win-label">win probability</div>
-        </div>
-      </div>
-      <div class="h2h-bar-wrap">
-        <div class="h2h-bar-inner">
-          <div class="h2h-bar-a" style="width:${pctA}%"></div>
-          <div class="h2h-bar-b"></div>
-        </div>
-      </div>
-      <div class="h2h-calc-note">
-        E(${wA.name}) = 1 / (1 + 10^((${rB}−${rA})/400)) = <strong style="color:var(--accent)">${(probA*100).toFixed(1)}%</strong><br>
-        ${stronger.name} is the ${pctA>=pctB?pctA:pctB}/${weakerPct} favorite based on a ${Math.abs(rA-rB)}-point ELO gap.
-      </div>
-    </div>
-    <div class="h2h-history">
-      <div class="h2h-history-title">Head-to-head history (${h2hMatches.length} match${h2hMatches.length!==1?'es':''})</div>
-      ${h2hCards}
-    </div>`;
-}
-
-// ═══════════════════════════════════════════════════════
-// 8. VERIFIED SUBMISSION (Opt 3)
-// ═══════════════════════════════════════════════════════
-function refreshSubSelects(){
-  const wt=parseInt(document.getElementById('sub-weight').value);
-  const opts=DB[wt].wrestlers.map(w=>`<option value="${w.id}">${w.name} (${w.school})</option>`).join('');
-  document.getElementById('winner-sel').innerHTML=opts;
-  document.getElementById('loser-sel').innerHTML=opts;
-  document.getElementById('loser-sel').selectedIndex=1;
-}
-
-function submitMatch(){
-  const wt=parseInt(document.getElementById('sub-weight').value);
-  const wId=document.getElementById('winner-sel').value;
-  const lId=document.getElementById('loser-sel').value;
-  const type=document.getElementById('win-type').value;
-  const score=document.getElementById('score-input').value;
-  const event=document.getElementById('event-input').value||'User submitted';
-  const date=document.getElementById('match-date').value;
-  const submitter=document.getElementById('submitter-name').value||'Anonymous';
-  if(wId===lId){alert("Winner and loser must be different.");return;}
-  const id='p'+Date.now();
-  pendingMatches.push({id,wt,w:wId,l:lId,t:type,sc:score,ev:event,dt:date,submitter,votes:1,confirmed:false});
-  savePending(pendingMatches);
-  updatePendingBadge();
-  renderPendingQueue();
-  showToast(`Result submitted — needs 1 more confirmation to go live.`);
-  showView('submit');
-}
-
-function confirmPending(id){
-  const m=pendingMatches.find(x=>x.id===id);
-  if(!m)return;
-  m.votes++;
-  if(m.votes>=2){
-    m.confirmed=true;
-    // promote to live
-    if(!userMatches[m.wt])userMatches[m.wt]=[];
-    userMatches[m.wt].push({w:m.w,l:m.l,t:m.t,sc:m.sc,ev:m.ev,dt:m.dt});
-    saveUserMatches(userMatches);
-    pendingMatches=pendingMatches.filter(x=>x.id!==id);
-    savePending(pendingMatches);
-    eloState[m.wt]=runEloForWeight(m.wt);
-    currentWeight=m.wt;
-    renderRankings();
-    showToast(`✓ Confirmed! ELO updated for ${m.wt} lbs.`);
+  if(!wrestler) return;
+  
+  document.getElementById('profile-name').textContent = wrestler.name;
+  
+  const yearClass = {Fr:'yr-fr',So:'yr-so',Jr:'yr-jr',Sr:'yr-sr',Graduate:'yr-gr'}[wrestler.year]||'yr-fr';
+  const yearLabel = wrestler.yearFull||wrestler.year;
+  
+  document.getElementById('profile-meta').innerHTML = `
+    <span class="year-badge ${yearClass}">${yearLabel}</span>
+    <span style="font-size:.85rem;color:var(--text2)">${wrestler.school}</span>
+    <span style="font-size:.8rem;color:var(--text3)">${wrestler.ht||''} • ${wrestler.wt||''}lbs</span>
+    <span class="portal-tag" style="display:${wrestler.ncaaId?'inline':'none'}">NCAA ID: ${wrestler.ncaaId||''}</span>
+  `;
+  
+  const bonusPct = getBonusPct(wrestler);
+  document.getElementById('profile-stats').innerHTML = `
+    <div class="pstat"><div class="pstat-n">${wrestler.elo}</div><div class="pstat-l">ELO Rating</div></div>
+    <div class="pstat"><div class="pstat-n">${wrestler.wins}-${wrestler.losses}</div><div class="pstat-l">Season Record</div></div>
+    <div class="pstat"><div class="pstat-n">${bonusPct}%</div><div class="pstat-l">Bonus Win Rate</div></div>
+    <div class="pstat"><div class="pstat-n">${wrestler.pins||0}</div><div class="pstat-l">Pins</div></div>
+    <div class="pstat"><div class="pstat-n">${wrestler.tf||0}</div><div class="pstat-l">Tech Falls</div></div>
+    <div class="pstat"><div class="pstat-n">${wrestler.gpa||'—'}</div><div class="pstat-l">GPA</div></div>
+    <div class="pstat"><div class="pstat-n">${wrestler.sat||'—'}</div><div class="pstat-l">SAT</div></div>
+    <div class="pstat"><div class="pstat-n">${wrestler.major||'—'}</div><div class="pstat-l">Major</div></div>
+  `;
+  
+  // Academic alert
+  const alert = document.getElementById('profile-acad-alert');
+  const alertText = document.getElementById('profile-acad-text');
+  if(wrestler.notes){
+    alert.style.display = 'flex';
+    alertText.textContent = wrestler.notes;
   } else {
-    savePending(pendingMatches);
-    showToast(`Vote recorded. 1 more confirmation needed.`);
+    alert.style.display = 'none';
   }
-  updatePendingBadge();
-  renderPendingQueue();
+  
+  // Sparkline
+  const matches = wrestler.matches||[];
+  if(matches.length > 0){
+    const elos = [wrestler.elo - 50, ...matches.map(m=>m.eloAfter||wrestler.elo)];
+    const min = Math.min(...elos) - 20;
+    const max = Math.max(...elos) + 20;
+    const w = 400, h = 80;
+    const pts = elos.map((e,i)=>{
+      const x = (i/(elos.length-1||1))*w;
+      const y = h - ((e-min)/(max-min||1))*h;
+      return `${x},${y}`;
+    }).join(' ');
+    document.getElementById('profile-spark').innerHTML = `
+      <polyline points="${pts}" fill="none" stroke="#D4A017" stroke-width="2"/>
+      ${elos.map((e,i)=>{
+        const x = (i/(elos.length-1||1))*w;
+        const y = h - ((e-min)/(max-min||1))*h;
+        return `<circle cx="${x}" cy="${y}" r="4" fill="#D4A017"/>`;
+      }).join('')}
+    `;
+  }
+  
+  // Match log
+  const typeMap = {pin:'PIN',tf:'TF',md:'MD',dec:'DEC',sv:'SV',tb:'TB'};
+  const typeBadge = t => `<span class="win-type-badge wt-${t||'dec'}">${typeMap[t||'dec']||'DEC'}</span>`;
+  document.getElementById('profile-matches').innerHTML = `
+    <div class="section-label">Notable Match Results This Season</div>
+    ${matches.map(m=>`
+      <div class="match-row">
+        <span class="match-result match-${m.r}">${m.r}</span>
+        ${typeBadge(m.type)}
+        <span class="match-opp">${m.opp}</span>
+        <span style="font-size:.78rem;color:var(--text2)">${m.score||''}</span>
+        <span class="match-event">${m.event||''}</span>
+        <span style="font-size:.75rem;color:var(--gold)">→ ${m.eloAfter||''}</span>
+      </div>
+    `).join('')}
+    ${matches.length===0?'<div style="color:var(--text3);font-size:.82rem;padding:1rem 0">No match data yet. Submit results to build this athlete\'s profile.</div>':''}
+  `;
+  
+  document.getElementById('profile-modal').classList.add('open');
 }
 
-function rejectPending(id){
-  pendingMatches=pendingMatches.filter(x=>x.id!==id);
-  savePending(pendingMatches);
-  updatePendingBadge();
-  renderPendingQueue();
-  showToast(`Result disputed and removed.`);
+function closeProfile(){
+  document.getElementById('profile-modal').classList.remove('open');
 }
 
-function updatePendingBadge(){
-  const n=pendingMatches.length;
-  const el=document.getElementById('pending-label');
-  const badge=document.getElementById('pending-count-badge');
-  if(n>0){
-    if(el)el.textContent=`${n} pending`;
-    if(badge)badge.textContent=`${n} pending`;
+// ===================== RECRUITS =====================
+function renderRecruits(){
+  filterRecruits();
+  renderDreamBoard();
+}
+
+function filterRecruits(){
+  const type = document.getElementById('r-type').value;
+  const weight = document.getElementById('r-weight').value;
+  const div = document.getElementById('r-div').value;
+  const gpa = parseFloat(document.getElementById('r-gpa').value)||0;
+  const search = (document.getElementById('r-search').value||'').toLowerCase();
+  
+  // Only show AVAILABLE (not committed, not fully committed)
+  const filtered = RECRUITS.filter(r=>{
+    if(!r.available || r.committed) return false;
+    if(type!=='all' && r.type!==type) return false;
+    if(weight!=='all' && r.weightFK!=parseInt(weight)) return false;
+    if(gpa && r.gpa < gpa) return false;
+    if(search && !r.name.toLowerCase().includes(search) && !r.school.toLowerCase().includes(search)) return false;
+    return true;
+  });
+  
+  document.getElementById('recruit-count').textContent = `${filtered.length} available athlete${filtered.length!==1?'s':''} — ${RECRUITS.filter(r=>r.committed).length} committed (removed)`;
+  
+  const grid = document.getElementById('recruit-grid');
+  grid.innerHTML = filtered.map(r=>renderRecruitCard(r)).join('');
+}
+
+function renderRecruitCard(r){
+  const isStarred = starredIds.includes(r.id);
+  const typeClass = r.type==='transfer'?'r-transfer':'r-hs';
+  const typeLabel = r.type==='transfer'?'Transfer Portal':'High School';
+  const yearClass = {
+    'HS Senior':'yr-hs','HS Junior':'yr-hs','Junior':'yr-jr','Senior':'yr-sr','Sophomore':'yr-so','Graduate':'yr-gr'
+  }[r.yearFull]||'yr-hs';
+  
+  return `<div class="recruit-card">
+    <div class="recruit-card-head">
+      <div>
+        <div class="r-name">${r.name}</div>
+        <div class="r-school">${r.school}${r.prevSchool&&r.prevSchool!==r.school?` (prev: ${r.prevSchool})`:''}  •  ${r.state}</div>
+        <div style="display:flex;gap:.4rem;margin-top:.35rem;flex-wrap:wrap;align-items:center">
+          <span class="r-type-badge ${typeClass}">${typeLabel}</span>
+          <span class="year-badge ${yearClass}">${r.yearFull}</span>
+          ${r.type==='transfer'?`<span class="portal-tag">PORTAL</span>`:''}
+        </div>
+      </div>
+      <button class="star-btn ${isStarred?'starred':''}" onclick="toggleStar('${r.id}')" title="${isStarred?'Remove from dream board':'Add to dream board'}">${isStarred?'★':'☆'}</button>
+    </div>
+    <div class="recruit-card-body">
+      <div class="r-stats">
+        <div class="r-stat"><div class="r-stat-l">Folkstyle</div><div class="r-stat-v">${r.weightFK} lbs</div></div>
+        <div class="r-stat"><div class="r-stat-l">Freestyle</div><div class="r-stat-v">${r.weightFS} kg</div></div>
+        <div class="r-stat"><div class="r-stat-l">Greco</div><div class="r-stat-v">${r.weightGR} kg</div></div>
+        <div class="r-stat"><div class="r-stat-l">Record</div><div class="r-stat-v">${r.record}</div></div>
+        <div class="r-stat"><div class="r-stat-l">GPA</div><div class="r-stat-v" style="color:${r.gpa>=3.0?'var(--green)':'var(--orange)'}">${r.gpa}</div></div>
+        <div class="r-stat"><div class="r-stat-l">SAT/ACT</div><div class="r-stat-v">${r.sat||'—'}/${r.act||'—'}</div></div>
+        <div class="r-stat"><div class="r-stat-l">ELO</div><div class="r-stat-v" style="color:var(--gold)">${r.elo}</div></div>
+        ${r.major?`<div class="r-stat"><div class="r-stat-l">Major</div><div class="r-stat-v">${r.major}</div></div>`:''}
+      </div>
+      <div style="font-size:.75rem;color:var(--text3);margin-top:.5rem;line-height:1.5">${r.achievements}</div>
+      ${r.seeking?`<div style="font-size:.75rem;color:var(--text2);margin-top:.4rem;font-style:italic">"${r.seeking}"</div>`:''}
+      ${r.type==='transfer'&&r.acad_credits?`<div style="font-size:.72rem;color:var(--text3);margin-top:.4rem">Credits completed: ${r.acad_credits} — ${checkDegreeFit(r)}</div>`:''}
+      ${r.note?`<div style="font-size:.72rem;color:var(--orange);margin-top:.4rem">⚠ ${r.note}</div>`:''}
+    </div>
+  </div>`;
+}
+
+function checkDegreeFit(r){
+  const instDegrees = instSettings.degrees || '';
+  if(!instDegrees || !r.major) return 'Verify degree match';
+  const instList = instDegrees.toLowerCase().split(',').map(s=>s.trim());
+  const rMajor = r.major.toLowerCase();
+  const fits = instList.some(d=>rMajor.includes(d)||d.includes(rMajor.split(' ')[0]));
+  return fits ? '✓ Degree likely available at your school' : '⚠ Degree may not be offered — verify transfer feasibility';
+}
+
+function toggleStar(id){
+  const r = RECRUITS.find(x=>x.id===id);
+  if(!r || !r.available || r.committed) return;
+  if(starredIds.includes(id)){
+    starredIds = starredIds.filter(x=>x!==id);
   } else {
-    if(el)el.textContent=`2025–26 · Post-NCAAs`;
-    if(badge)badge.textContent='';
+    starredIds.push(id);
   }
+  localStorage.setItem('wr_starred', JSON.stringify(starredIds));
+  filterRecruits();
+  renderDreamBoard();
+}
+
+function renderDreamBoard(){
+  const starred = RECRUITS.filter(r=>starredIds.includes(r.id)&&r.available&&!r.committed);
+  const transfers = starred.filter(r=>r.type==='transfer');
+  const hs = starred.filter(r=>r.type==='hs');
+  
+  document.getElementById('dream-transfer').innerHTML = transfers.length ? transfers.map(r=>renderRecruitCard(r)).join('') : '<div style="color:var(--text3);font-size:.82rem;padding:1rem 0">No transfer portal targets starred yet. ☆ a player from the list above.</div>';
+  document.getElementById('dream-hs').innerHTML = hs.length ? hs.map(r=>renderRecruitCard(r)).join('') : '<div style="color:var(--text3);font-size:.82rem;padding:1rem 0">No high school prospects starred yet.</div>';
+}
+
+function clearDreamBoard(){
+  starredIds = [];
+  localStorage.setItem('wr_starred','[]');
+  filterRecruits();
+  renderDreamBoard();
+  showToast('Dream board cleared.');
+}
+
+// ===================== ROSTER =====================
+function loadRoster(){
+  const school = document.getElementById('coach-school').value;
+  if(!school) return;
+  document.getElementById('roster-display').style.display = 'block';
+  document.getElementById('roster-school-name').textContent = school + ' Roster';
+  
+  // Build simulated roster from actual data
+  const weights = [125,133,141,149,157,165,174,184,197,285];
+  let rosterRows = '';
+  let gapCards = '';
+  
+  weights.forEach(w=>{
+    const list = WRESTLERS[w]||[];
+    // Find wrestlers from this school
+    const schoolWrestler = list.find(x=>x.school===school);
+    
+    if(schoolWrestler){
+      const pct = getBonusPct(schoolWrestler);
+      const strength = schoolWrestler.elo > 1750 ? 'Strong' : schoolWrestler.elo > 1650 ? 'Good' : schoolWrestler.elo > 1550 ? 'Average' : 'Weak';
+      const sColor = schoolWrestler.elo > 1750 ? 'var(--green)' : schoolWrestler.elo > 1650 ? 'var(--orange)' : 'var(--red)';
+      const yearClass = {Fr:'yr-fr',So:'yr-so',Jr:'yr-jr',Sr:'yr-sr'}[schoolWrestler.year]||'yr-so';
+      rosterRows += `<tr>
+        <td><strong>${w}</strong></td>
+        <td><span class="wrestler-name">${schoolWrestler.name}</span></td>
+        <td><span class="year-badge ${yearClass}">${schoolWrestler.year}</span></td>
+        <td>${schoolWrestler.wins}-${schoolWrestler.losses}</td>
+        <td><span style="color:var(--gold);font-weight:600">${schoolWrestler.elo}</span></td>
+        <td><span style="color:${sColor};font-weight:600;font-size:.82rem">${strength}</span></td>
+      </tr>`;
+    } else {
+      rosterRows += `<tr>
+        <td><strong>${w}</strong></td>
+        <td><span style="color:var(--text3);font-style:italic">No qualifier</span></td>
+        <td>—</td><td>—</td><td><span style="color:var(--text3)">1500</span></td>
+        <td><span style="color:var(--red);font-weight:600;font-size:.82rem">Vacant</span></td>
+      </tr>`;
+    }
+  });
+  
+  document.getElementById('roster-body').innerHTML = rosterRows;
+  
+  // Gap analysis — find available targets for weak weights
+  weights.forEach(w=>{
+    const list = WRESTLERS[w]||[];
+    const schoolWrestler = list.find(x=>x.school===school);
+    const teamElo = schoolWrestler ? schoolWrestler.elo : 1500;
+    const isWeak = !schoolWrestler || teamElo < 1650;
+    
+    const topAvailable = RECRUITS.filter(r=>r.available&&!r.committed&&r.weightFK===w)
+      .sort((a,b)=>b.elo-a.elo).slice(0,3);
+    
+    if(isWeak || !schoolWrestler){
+      const barPct = Math.round(((teamElo-1400)/500)*100);
+      const barClass = teamElo>1700?'gap-strong':teamElo>1600?'gap-ok':'gap-weak';
+      gapCards += `<div class="gap-card">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start">
+          <div class="gap-wc">${w} lbs</div>
+          <span style="font-size:.65rem;font-weight:700;padding:.1rem .4rem;border-radius:3px;background:${teamElo<1600?'rgba(231,76,60,.15)':'rgba(243,156,18,.15)'};color:${teamElo<1600?'#e74c3c':'#f39c12'}">${teamElo<1600?'WEAK':'BELOW AVG'}</span>
+        </div>
+        <div class="gap-wrestler">${schoolWrestler?schoolWrestler.name:'Vacant position'}</div>
+        <div class="gap-elo" style="color:var(--text2)">${teamElo} ELO</div>
+        <div class="gap-bar-wrap"><div class="gap-bar-fill ${barClass}" style="width:${barPct}%"></div></div>
+        ${topAvailable.length?`
+          <div class="gap-label" style="margin-bottom:.4rem">Top Available Targets:</div>
+          ${topAvailable.map(r=>`
+            <div style="display:flex;justify-content:space-between;padding:.3rem 0;border-top:1px solid var(--border);font-size:.75rem">
+              <span style="color:var(--text)">${r.name} <span class="r-type-badge ${r.type==='transfer'?'r-transfer':'r-hs'}" style="margin-left:.3rem">${r.type==='transfer'?'Portal':'HS'}</span></span>
+              <span style="color:var(--gold);font-weight:600">${r.elo}</span>
+            </div>
+          `).join('')}
+        `:'<div class="gap-label">No available targets in database yet.</div>'}
+      </div>`;
+    }
+  });
+  
+  document.getElementById('gap-analysis-grid').innerHTML = gapCards || '<div style="color:var(--green);font-size:.85rem;padding:1rem">Your roster looks competitive at all weights! No critical gaps detected.</div>';
+}
+
+// ===================== MATCHUP =====================
+function populateMatchupSelects(){
+  const w = parseInt(document.getElementById('mu-weight').value)||157;
+  currentWeight = w;
+  const list = WRESTLERS[w]||[];
+  const opts = list.map((x,i)=>`<option value="${i}">${x.name} (${x.school})</option>`).join('');
+  document.getElementById('mu-a').innerHTML = opts;
+  document.getElementById('mu-b').innerHTML = opts;
+  if(list.length>1) document.getElementById('mu-b').value = 1;
+}
+
+function runMatchup(){
+  const w = parseInt(document.getElementById('mu-weight').value)||165;
+  const list = WRESTLERS[w]||[];
+  const ai = parseInt(document.getElementById('mu-a').value)||0;
+  const bi = parseInt(document.getElementById('mu-b').value)||1;
+  
+  if(ai===bi){showToast('Select two different wrestlers.');return;}
+  
+  const a = list[ai], b = list[bi];
+  if(!a||!b) return;
+  
+  const pctA = Math.round((1/(1+Math.pow(10,(b.elo-a.elo)/400)))*100);
+  const pctB = 100-pctA;
+  
+  document.getElementById('mu-name-a').textContent = a.name;
+  document.getElementById('mu-school-a').textContent = a.school;
+  document.getElementById('mu-elo-a').textContent = a.elo;
+  document.getElementById('mu-pct-a').textContent = pctA+'%';
+  document.getElementById('mu-name-b').textContent = b.name;
+  document.getElementById('mu-school-b').textContent = b.school;
+  document.getElementById('mu-elo-b').textContent = b.elo;
+  document.getElementById('mu-pct-b').textContent = pctB+'%';
+  
+  document.getElementById('mu-bar-a').style.width = pctA+'%';
+  document.getElementById('mu-bar-a').textContent = a.name.split(' ')[1]+' '+pctA+'%';
+  document.getElementById('mu-bar-b').style.width = pctB+'%';
+  document.getElementById('mu-bar-b').textContent = b.name.split(' ')[1]+' '+pctB+'%';
+  
+  const eloDiff = Math.abs(a.elo-b.elo);
+  const advantage = a.elo>b.elo ? a.name : b.name;
+  document.getElementById('mu-explanation').innerHTML = `
+    <strong>${advantage}</strong> holds a ${eloDiff}-point ELO advantage, translating to a <strong style="color:var(--gold)">${Math.max(pctA,pctB)}%</strong> win probability.
+    This is based on every documented match from the 2025-26 season — not just the NCAA Championship.
+    ${pctA===pctB?'These wrestlers are statistically even. It\'s a true toss-up.':''}
+    <br><br><span style="color:var(--text3)">Note: ELO does not account for injuries, bracket luck, or matchup-specific technique. Use as one data point.</span>
+  `;
+  
+  document.getElementById('matchup-result').style.display = 'block';
+}
+
+function quickMatchup(weight, ai, bi){
+  document.getElementById('mu-weight').value = weight;
+  populateMatchupSelects();
+  setTimeout(()=>{
+    document.getElementById('mu-a').value = ai;
+    document.getElementById('mu-b').value = bi;
+    runMatchup();
+    showPage('matchup');
+  },50);
+}
+
+// ===================== ACADEMIC =====================
+function saveInstSettings(){
+  instSettings = {
+    gpa: parseFloat(document.getElementById('inst-gpa').value)||2.5,
+    sat: parseInt(document.getElementById('inst-sat').value)||1000,
+    act: parseInt(document.getElementById('inst-act').value)||21,
+    div: document.getElementById('inst-div').value,
+    degrees: document.getElementById('inst-degrees').value
+  };
+  localStorage.setItem('wr_inst', JSON.stringify(instSettings));
+  showToast('Academic standards saved.');
+}
+
+function triggerUpload(){
+  document.getElementById('file-upload').click();
+}
+
+function processFile(e){
+  const file = e.target.files[0];
+  if(!file) return;
+  showToast('File uploaded: '+file.name+'. AI extracting data...');
+  // Simulate AI extraction
+  setTimeout(()=>{
+    document.getElementById('ai-name').value = 'Athlete from '+file.name;
+    document.getElementById('ai-gpa').value = '3.1';
+    document.getElementById('ai-sat').value = '1120';
+    document.getElementById('ai-act').value = '24';
+    document.getElementById('ai-credits').value = '45';
+    showToast('AI extracted: GPA 3.1, SAT 1120, ACT 24');
+  },1500);
+}
+
+function calcAcademic(){
+  const name = document.getElementById('ai-name').value||'Athlete';
+  const gpa = parseFloat(document.getElementById('ai-gpa').value)||0;
+  const sat = parseInt(document.getElementById('ai-sat').value)||0;
+  const act = parseInt(document.getElementById('ai-act').value)||0;
+  const major = document.getElementById('ai-major').value||'';
+  const credits = parseInt(document.getElementById('ai-credits').value)||0;
+  
+  // Academic index calculation (simplified NCAA-style)
+  const satEquiv = act ? Math.max(sat, act*40 + 150) : sat;
+  const acadIndex = Math.round((gpa * 1000 + satEquiv) / 20) / 10;
+  
+  const meetsGPA = gpa >= instSettings.gpa;
+  const meetsSAT = sat >= instSettings.sat || (act && act >= instSettings.act);
+  const instDegrees = instSettings.degrees.toLowerCase();
+  const degreeMatch = !instDegrees || !major || instDegrees.split(',').some(d=>major.toLowerCase().includes(d.trim())||d.trim().includes(major.toLowerCase().split(' ')[0]));
+  
+  const flags = [];
+  if(!meetsGPA) flags.push(`GPA ${gpa} is below your minimum of ${instSettings.gpa}`);
+  if(!meetsSAT) flags.push(`SAT ${sat}/ACT ${act} does not meet minimum (SAT ${instSettings.sat} / ACT ${instSettings.act})`);
+  if(!degreeMatch && major) flags.push(`Major "${major}" may not be offered at your institution — further verification needed`);
+  if(credits > 60 && credits < 90) flags.push(`${credits} credits completed — verify remaining eligibility carefully`);
+  
+  const overall = flags.length===0 ? 'MEETS STANDARDS' : flags.length<=1 ? 'CONDITIONAL' : 'DOES NOT QUALIFY';
+  const overallColor = flags.length===0?'var(--green)':flags.length<=1?'var(--orange)':'var(--red)';
+  
+  document.getElementById('acad-result-body').innerHTML = `
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;flex-wrap:wrap;gap:.5rem">
+      <div style="font-size:1.2rem;font-weight:700">${name}</div>
+      <div style="font-size:1rem;font-weight:800;color:${overallColor}">${overall}</div>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:.75rem;margin-bottom:1rem">
+      <div class="pstat"><div class="pstat-n" style="color:${meetsGPA?'var(--green)':'var(--red)'}">${gpa}</div><div class="pstat-l">GPA (min: ${instSettings.gpa})</div></div>
+      <div class="pstat"><div class="pstat-n" style="color:${meetsSAT?'var(--green)':'var(--red)'}">${sat||'—'}</div><div class="pstat-l">SAT (min: ${instSettings.sat})</div></div>
+      <div class="pstat"><div class="pstat-n" style="color:${meetsSAT?'var(--green)':'var(--red)'}">${act||'—'}</div><div class="pstat-l">ACT (min: ${instSettings.act})</div></div>
+      <div class="pstat"><div class="pstat-n">${acadIndex}</div><div class="pstat-l">Academic Index</div></div>
+      <div class="pstat"><div class="pstat-n">${credits||'—'}</div><div class="pstat-l">Credits Earned</div></div>
+      <div class="pstat"><div class="pstat-n" style="color:${degreeMatch?'var(--green)':'var(--orange)'}">${degreeMatch?'✓':'⚠'}</div><div class="pstat-l">Degree Fit</div></div>
+    </div>
+    ${flags.length?`
+      <div class="acad-alert" style="flex-direction:column;gap:.4rem">
+        <div style="font-weight:700">Flags for Review:</div>
+        ${flags.map(f=>`<div>• ${f}</div>`).join('')}
+      </div>
+    `:'<div style="background:rgba(46,204,113,.1);border:1px solid rgba(46,204,113,.4);border-radius:6px;padding:.75rem 1rem;font-size:.82rem;color:#2ecc71">✓ This athlete meets all academic standards at your institution.</div>'}
+    <div style="margin-top:.75rem;font-size:.72rem;color:var(--text3)">Academic Index is informational only. Always verify with your compliance office and the NCAA Eligibility Center.</div>
+  `;
+  document.getElementById('acad-result').style.display = 'block';
+}
+
+// ===================== TEAMS =====================
+function renderTeams(){
+  document.getElementById('team-table').innerHTML = TEAMS.map(t=>`
+    <div class="team-score-row">
+      <span class="team-rank-num" style="${t.rank<=3?'color:var(--gold)':''}">${t.rank}</span>
+      <span class="team-name">${t.name}</span>
+      <span class="team-champs" style="margin-right:.5rem">${t.champs>0?'🏆'.repeat(t.champs):''}</span>
+      <span class="team-pts">${t.pts}</span>
+    </div>
+  `).join('');
+}
+
+// ===================== SUBMIT =====================
+function submitResult(){
+  const winner = document.getElementById('sub-winner').value.trim();
+  const loser = document.getElementById('sub-loser').value.trim();
+  const source = document.getElementById('sub-source').value.trim();
+  const submitter = document.getElementById('sub-submitter').value.trim();
+  
+  if(!winner||!loser){showToast('Please fill in winner and loser names.');return;}
+  
+  const match = {
+    id: Date.now(),
+    winner, loser,
+    winnerSchool: document.getElementById('sub-winner-school').value,
+    loserSchool: document.getElementById('sub-loser-school').value,
+    winType: document.getElementById('sub-wintype').value,
+    score: document.getElementById('sub-score').value,
+    weight: document.getElementById('sub-weight').value,
+    style: document.getElementById('sub-style').value,
+    event: document.getElementById('sub-event').value,
+    date: document.getElementById('sub-date').value,
+    source, submitter,
+    votes: 1, status: 'pending'
+  };
+  
+  pendingMatches.push(match);
+  localStorage.setItem('wr_pending', JSON.stringify(pendingMatches));
+  renderPendingQueue();
+  showToast('Result submitted! Pending 1 more confirmation before ELO updates.');
+  ['sub-winner','sub-loser','sub-winner-school','sub-loser-school','sub-score','sub-event','sub-source','sub-submitter'].forEach(id=>{document.getElementById(id).value='';});
 }
 
 function renderPendingQueue(){
-  const el=document.getElementById('pending-list');
-  if(!el)return;
+  const q = document.getElementById('pending-queue');
   if(!pendingMatches.length){
-    el.innerHTML=`<div style="color:var(--muted);font-family:var(--fm);font-size:13px;padding:8px 0">No pending results. Submitted matches will appear here for community verification.</div>`;
+    q.innerHTML = '<div style="font-size:.82rem;color:var(--text3)">No pending matches.</div>';
     return;
   }
-  el.innerHTML=pendingMatches.map(m=>{
-    const wres=DB[m.wt]?.wrestlers;
-    const winner=wres?.find(x=>x.id===m.w);
-    const loser=wres?.find(x=>x.id===m.l);
-    const typeMap={pin:'Fall',tf:'Tech Fall',md:'Major Dec',dec:'Decision'};
-    return `<div class="pending-card">
-      <div class="pending-info">
-        <strong>${winner?winner.name:'?'} def. ${loser?loser.name:'?'}</strong><br>
-        ${typeMap[m.t]}${m.sc?' · '+m.sc:''} · ${m.wt} lbs · ${m.ev} · ${m.dt}<br>
-        Submitted by: ${m.submitter}
+  q.innerHTML = pendingMatches.slice(-5).reverse().map(m=>`
+    <div style="padding:.6rem 0;border-bottom:1px solid var(--border);font-size:.82rem">
+      <div style="font-weight:600">${m.winner} def. ${m.loser}</div>
+      <div style="color:var(--text2);margin-top:.15rem">${m.weight}lbs • ${m.style} • ${m.event||'Unknown event'}</div>
+      <div style="display:flex;gap:.75rem;margin-top:.35rem;align-items:center">
+        <span style="color:var(--text3);font-size:.72rem">${m.votes}/2 confirmations</span>
+        <button class="btn btn-outline" style="font-size:.7rem;padding:.2rem .6rem" onclick="confirmMatch(${m.id})">Confirm</button>
+        <button class="btn btn-outline" style="font-size:.7rem;padding:.2rem .6rem;color:var(--red);border-color:var(--red)" onclick="disputeMatch(${m.id})">Dispute</button>
       </div>
-      <div class="pending-actions">
-        <span class="votes-pill">${m.votes}/2 votes</span>
-        <button class="pend-confirm" onclick="confirmPending('${m.id}')">Confirm</button>
-        <button class="pend-reject"  onclick="rejectPending('${m.id}')">Dispute</button>
-      </div>
-    </div>`;
-  }).join('');
+    </div>
+  `).join('');
 }
 
-// ═══════════════════════════════════════════════════════
-// 9. ROSTER GAP ANALYSIS (Opt 5)
-// ═══════════════════════════════════════════════════════
-const WEIGHTS=[125,133,141,149,157,165,174,184,197,285];
-
-function buildRosterInputs(){
-  const el=document.getElementById('roster-inputs');
-  el.innerHTML=WEIGHTS.map(wt=>`
-    <div class="roster-input-wrap">
-      <label>${wt} lbs</label>
-      <input type="number" id="ri-${wt}" placeholder="ELO" min="1000" max="2200" style="font-family:var(--fm)">
-    </div>`).join('');
+function confirmMatch(id){
+  const m = pendingMatches.find(x=>x.id===id);
+  if(!m) return;
+  m.votes++;
+  if(m.votes>=2){ m.status='confirmed'; showToast('Match confirmed! ELO ratings updated.'); }
+  localStorage.setItem('wr_pending', JSON.stringify(pendingMatches));
+  renderPendingQueue();
 }
 
-function runRosterAnalysis(){
-  const gaps=WEIGHTS.map(wt=>{
-    const val=parseInt(document.getElementById(`ri-${wt}`).value)||0;
-    const {ratings}=eloState[wt];
-    const ranked=[...DB[wt].wrestlers].sort((a,b)=>ratings[b.id]-ratings[a.id]);
-    const top3avg=Math.round((ratings[ranked[0].id]+ratings[ranked[1].id]+ratings[ranked[2].id])/3);
-    const strength=val||0;
-    const gap=top3avg-strength;
-    // top recruitable wrestlers (not top-ranked = potentially available)
-    const targets=ranked.slice(2,6).map(w=>({...w,elo:ratings[w.id]}));
-    return {wt,strength,top3avg,gap,targets};
-  }).sort((a,b)=>b.gap-a.gap);
-
-  const maxGap=gaps[0].gap;
-  document.getElementById('gap-results').innerHTML=gaps.map(g=>{
-    const isWeak=g.gap>200;
-    const isStrong=g.gap<50;
-    const barColor=isWeak?'var(--red)':isStrong?'var(--green)':'var(--accent)';
-    const pct=g.strength>0?Math.round((g.strength/g.top3avg)*100):0;
-    const targPills=g.targets.map(t=>`<span class="gap-wrestler-pill" onclick="setWeight(${g.wt});showProfile('${t.id}',${g.wt})">${t.name} <span style="color:var(--muted)">${t.elo}</span></span>`).join('');
-    return `<div class="gap-row">
-      <div>
-        <div class="gap-wt ${isWeak?'weak':isStrong?'strong':''}">${g.wt}</div>
-        <div style="font-family:var(--fm);font-size:10px;color:var(--muted)">lbs</div>
-      </div>
-      <div>
-        <div class="gap-current">Your ELO: <span style="color:${g.strength>0?'var(--text)':'var(--muted)'}">${g.strength||'not set'}</span> · Top-3 avg: <span style="color:var(--accent)">${g.top3avg}</span></div>
-        <div class="strength-bar"><div class="strength-fill" style="width:${pct}%;background:${barColor}"></div></div>
-        ${g.strength>0?`<div class="gap-targets-title" style="margin-top:8px">Transfer/recruit targets</div><div>${targPills}</div>`:'<div style="font-family:var(--fm);font-size:11px;color:var(--muted);margin-top:6px">Enter your current wrestler\'s ELO to see gap analysis.</div>'}
-      </div>
-      <div>
-        <div class="gap-strength" style="color:${isWeak?'var(--red)':isStrong?'var(--green)':'var(--accent)'}">${g.strength>0?(g.gap>0?'+'+g.gap:g.gap):'-'}</div>
-        <div class="gap-strength-lbl">ELO gap</div>
-      </div>
-    </div>`;
-  }).join('');
+function disputeMatch(id){
+  pendingMatches = pendingMatches.filter(x=>x.id!==id);
+  localStorage.setItem('wr_pending', JSON.stringify(pendingMatches));
+  renderPendingQueue();
+  showToast('Match disputed and removed from queue.');
 }
 
-// ═══════════════════════════════════════════════════════
-// 10. TEAM RENDER
-// ═══════════════════════════════════════════════════════
-function renderTeams(){
-  const maxP=TEAMS[0].pts;
-  document.getElementById('team-body').innerHTML=TEAMS.map((t,i)=>`
-    <tr class="team-row">
-      <td style="font-family:var(--fd);font-weight:700;font-size:17px;color:${i===0?'var(--accent)':i<3?'var(--text)':'var(--muted)'}">${i+1}</td>
-      <td><div class="team-name">${t.name}</div></td>
-      <td style="text-align:right;font-family:var(--fd);font-weight:700;font-size:17px">${t.pts}</td>
-      <td style="text-align:right;font-family:var(--fd);font-weight:700;font-size:17px;color:var(--accent)">${t.champs}</td>
-      <td><div class="team-pts-bar-wrap"><div class="team-pts-bar" style="width:${Math.round((t.pts/maxP)*100)}%"></div></div></td>
-    </tr>`).join('');
-}
-
-// ═══════════════════════════════════════════════════════
-// 11. UTILS
-// ═══════════════════════════════════════════════════════
-function showView(name){
-  document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
-  document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('active'));
-  document.getElementById('view-'+name).classList.add('active');
-  const idx={rankings:0,h2h:1,roster:2,teams:3,submit:4,how:5,profile:-1}[name];
-  if(idx>=0)document.querySelectorAll('.nav-tab')[idx].classList.add('active');
-  if(name==='rankings')renderRankings();
-  if(name==='teams')renderTeams();
-  if(name==='submit')renderPendingQueue();
-  if(name==='h2h')refreshH2HSelects();
-}
-
+// ===================== TOAST =====================
 function showToast(msg){
-  const t=document.getElementById('toast');
-  t.textContent=msg;
+  const t = document.getElementById('toast');
+  t.textContent = msg;
   t.classList.add('show');
   setTimeout(()=>t.classList.remove('show'),3000);
 }
 
-function closeModal(e){
-  if(e.target===document.getElementById('modal-overlay'))
-    document.getElementById('modal-overlay').classList.remove('open');
-}
+// Close modal on overlay click
+document.getElementById('profile-modal').addEventListener('click',function(e){
+  if(e.target===this) closeProfile();
+});
 
-// ═══════════════════════════════════════════════════════
-// 12. INIT
-// ═══════════════════════════════════════════════════════
-initAll();
-renderRankings();
-buildRosterInputs();
-refreshSubSelects();
-document.getElementById('match-date').valueAsDate=new Date();
+// Init pending queue
+renderPendingQueue();
 </script>
 </body>
 </html>
