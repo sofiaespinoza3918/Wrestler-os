@@ -27,7 +27,7 @@
   nav{display:flex;align-items:center;gap:0;background:var(--surface);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:100;height:56px;padding:0 1.5rem}
   .logo{font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:1.5rem;letter-spacing:.05em;color:var(--gold);margin-right:2rem;text-transform:uppercase}
   .logo span{color:var(--text2);font-weight:400}
-  .nav-tabs{display:flex;gap:0;flex:1;flex-wrap:wrap;overflow:hidden}
+  .nav-tabs{display:flex;gap:0;flex:1;overflow-x:auto}
   .nav-tab{padding:.7rem 1rem;font-size:.78rem;font-weight:500;letter-spacing:.06em;text-transform:uppercase;color:var(--text2);cursor:pointer;border-bottom:2px solid transparent;white-space:nowrap;transition:color .15s,border-color .15s}
   .nav-tab:hover{color:var(--text)}
   .nav-tab.active{color:var(--gold);border-bottom-color:var(--gold)}
@@ -261,8 +261,7 @@
   </div>
   <div class="nav-right">
     <span class="badge-division" id="currentDiv">D1</span>
-    <span class="badge-division" id="syncStatus">SYNC: LOCAL</span>
-    <button class="btn btn-outline" onclick="runDailySync(true)">Daily Refresh</button>
+    <button class="btn btn-gold" onclick="showPage('academic')">Coach Login</button>
   </div>
 </nav>
 
@@ -527,7 +526,6 @@
 
     <div class="section-title" style="margin-bottom:1rem">Gap Analysis — Available Targets</div>
     <div id="gap-analysis-grid" class="gap-grid"></div>
-    <div id="gap-target-browser" style="margin-top:1rem;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:1rem;color:var(--text2);font-size:.82rem">Click "View full target list" on a weight to browse all currently open transfer portal / high school / international targets for that weight.</div>
 
     <div class="section-title" style="margin:1.5rem 0 .75rem">Weight Room Comparison</div>
     <div id="weight-compare" style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:1rem;color:var(--text2);font-size:.82rem">Click a wrestler row to compare everyone on that team at the same weight and see division-fit context.</div>
@@ -1168,77 +1166,6 @@ const RECRUITS = [
   {id:'r21',name:'Drew Simpson',type:'transfer',school:'Wisconsin',prevSchool:'Wisconsin',weightFK:174,weightFS:79,weightGR:77,year:'Jr',yearFull:'Junior',gpa:3.0,sat:1090,act:23,major:'Communications',state:'WI',record:'18-9',elo:1521,achievements:'NCAA qualifier',available:false,committed:true,ncaaId:'TP010',ht:"5'11\"",acad_credits:78,seeking:null,status:'committed',committedTo:'Iowa'}
 ];
 
-// ===================== DATA LAYER (SYNC SCAFFOLD) =====================
-const DATA_SYNC_KEY = 'wr_data_sync_meta';
-let syncMeta = JSON.parse(localStorage.getItem(DATA_SYNC_KEY) || '{"lastSync":"","mode":"local"}');
-let DYNAMIC_WRESTLERS = JSON.parse(JSON.stringify(WRESTLERS));
-
-const SOURCE_ADAPTERS = [
-  {name:'flowrestling', enabled:true},
-  {name:'trackwrestling', enabled:true},
-  {name:'state-association-feeds', enabled:true},
-  {name:'international-feeds', enabled:true}
-];
-
-function getWeightPool(weight){
-  return DYNAMIC_WRESTLERS[weight] || [];
-}
-
-function findWrestlerById(id){
-  for(const wt of Object.keys(DYNAMIC_WRESTLERS)){
-    const found = (DYNAMIC_WRESTLERS[wt]||[]).find(w=>w.id===id);
-    if(found) return found;
-  }
-  return null;
-}
-
-function upsertWrestler(record){
-  const weight = parseInt(record.weightClass || record.weight || 0,10);
-  if(!weight) return;
-  if(!DYNAMIC_WRESTLERS[weight]) DYNAMIC_WRESTLERS[weight] = [];
-  const idx = DYNAMIC_WRESTLERS[weight].findIndex(w=>w.id===record.id || normalizeAthleteName(w.name)===normalizeAthleteName(record.name));
-  if(idx>=0){
-    DYNAMIC_WRESTLERS[weight][idx] = {...DYNAMIC_WRESTLERS[weight][idx], ...record};
-  } else {
-    DYNAMIC_WRESTLERS[weight].push(record);
-  }
-}
-
-async function fetchFromAdapter(adapter){
-  // Scaffold only: replace with production API calls.
-  return [];
-}
-
-function updateSyncBadge(state){
-  const el = document.getElementById('syncStatus');
-  if(!el) return;
-  if(state==='syncing') el.textContent = 'SYNC: RUNNING';
-  else if(state==='ready') el.textContent = `SYNC: ${syncMeta.lastSync ? new Date(syncMeta.lastSync).toISOString().slice(0,10) : 'LOCAL'}`;
-  else el.textContent = 'SYNC: LOCAL';
-}
-
-async function runDailySync(manual=false){
-  const today = new Date().toISOString().slice(0,10);
-  if(!manual && syncMeta.lastSync && syncMeta.lastSync.slice(0,10)===today){
-    updateSyncBadge('ready');
-    return;
-  }
-  updateSyncBadge('syncing');
-  try{
-    const payloads = await Promise.all(SOURCE_ADAPTERS.filter(s=>s.enabled).map(fetchFromAdapter));
-    payloads.flat().forEach(upsertWrestler);
-    syncMeta = {lastSync:new Date().toISOString(),mode:'scaffold'};
-    localStorage.setItem(DATA_SYNC_KEY, JSON.stringify(syncMeta));
-    updateSyncBadge('ready');
-    renderRankings();
-    populateMatchupSelects();
-    showToast('Data sync completed. New matches will flow into ratings on next source refresh.');
-  } catch (e){
-    updateSyncBadge('local');
-    showToast('Sync source unavailable. Using local cached data.');
-  }
-}
-
 
 const DIVISION_ELO_BASE = {D1:1660,D2:1560,D3:1500,NAIA:1530,NJCAA:1480,JUCO:1470};
 let lastRosterContext = {school:'',div:'D1',weights:{}};
@@ -1249,7 +1176,7 @@ function normalizeAthleteName(name){
 
 function hasCollegeProfile(name){
   const key = normalizeAthleteName(name);
-  return Object.values(DYNAMIC_WRESTLERS).flat().some(w=>normalizeAthleteName(w.name)===key);
+  return Object.values(WRESTLERS).flat().some(w=>normalizeAthleteName(w.name)===key);
 }
 
 function isRecruitEligible(r){
@@ -1275,7 +1202,7 @@ function projectedDivisionFit(elo, div, weight){
 }
 
 function buildTeamWeightRoom(school, div, weight){
-  const college = getWeightPool(weight).filter(x=>x.school===school).map(w=>({
+  const college = (WRESTLERS[weight]||[]).filter(x=>x.school===school).map(w=>({
     id:w.id,name:w.name,year:w.year,elo:w.elo,record:`${w.wins||0}-${w.losses||0}`,needsInfo:false,source:'college'
   }));
 
@@ -1335,8 +1262,6 @@ window.onload = function(){
   renderRecruits();
   renderTeams();
   populateMatchupSelects();
-  updateSyncBadge('ready');
-  runDailySync(false);
   document.getElementById('inst-gpa').value = instSettings.gpa;
   document.getElementById('inst-sat').value = instSettings.sat;
   document.getElementById('inst-act').value = instSettings.act;
@@ -1402,7 +1327,7 @@ function renderRankings(){
   const wts = WEIGHTS[currentStyle];
   const wt = currentWeight;
   // For freestyle/greco, we use folkstyle data as a proxy with adjusted note
-  const wrestlerData = getWeightPool(currentWeight);
+  const wrestlerData = WRESTLERS[currentWeight] || [];
   const sorted = [...wrestlerData].sort((a,b)=>b.elo-a.elo);
   
   const tbody = document.getElementById('rankings-body');
@@ -1429,7 +1354,11 @@ function renderRankings(){
 
 // ===================== PROFILE =====================
 function openProfile(id){
-  const wrestler = findWrestlerById(id);
+  let wrestler = null;
+  for(const wt of Object.values(WRESTLERS)){
+    const found = wt.find(w=>w.id===id);
+    if(found){wrestler=found;break;}
+  }
   if(!wrestler) return;
   
   document.getElementById('profile-name').textContent = wrestler.name;
@@ -1662,7 +1591,7 @@ function loadRoster(){
     });
 
     const topAvailable = RECRUITS.filter(r=>isRecruitEligible(r) && r.weightFK===w)
-      .sort((a,b)=>b.elo-a.elo);
+      .sort((a,b)=>b.elo-a.elo).slice(0,3);
 
     const starterElo = depthChart[0]?.elo || avg-40;
     const barPct = Math.max(8, Math.min(100, Math.round(((starterElo-1400)/500)*100)));
@@ -1678,11 +1607,10 @@ function loadRoster(){
       <div class="gap-bar-wrap"><div class="gap-bar-fill ${barClass}" style="width:${barPct}%"></div></div>
       ${topAvailable.length?`
         <div class="gap-label" style="margin-bottom:.4rem">Available only (Portal / HS uncommitted / eligible grad):</div>
-        ${topAvailable.slice(0,3).map(r=>`<div style="display:flex;justify-content:space-between;padding:.3rem 0;border-top:1px solid var(--border);font-size:.75rem">
+        ${topAvailable.map(r=>`<div style="display:flex;justify-content:space-between;padding:.3rem 0;border-top:1px solid var(--border);font-size:.75rem">
           <span style="color:var(--text)">${r.name} <span class="r-type-badge ${r.type==='transfer'?'r-transfer':'r-hs'}" style="margin-left:.3rem">${r.type==='transfer'?'Portal':'HS'}</span></span>
           <span style="color:var(--gold);font-weight:600">${r.elo}</span>
         </div>`).join('')}
-        <button class="btn btn-outline" style="width:100%;margin-top:.5rem" onclick="openGapTargetBrowser(${w})">View full target list (${topAvailable.length})</button>
       `:'<div class="gap-label">No eligible available targets in this weight right now.</div>'}
     </div>`;
   });
@@ -1690,29 +1618,7 @@ function loadRoster(){
   lastRosterContext = {school,div,weights:rosterByWeight};
   document.getElementById('roster-body').innerHTML = rosterRows;
   document.getElementById('gap-analysis-grid').innerHTML = gapCards;
-  document.getElementById('gap-target-browser').innerHTML = 'Click "View full target list" on a weight to browse all currently open transfer portal / high school / international targets for that weight.';
   document.getElementById('weight-compare').innerHTML = 'Click a wrestler row to compare everyone on that team at the same weight and see division-fit context.';
-}
-
-function openGapTargetBrowser(weight){
-  const list = RECRUITS.filter(r=>isRecruitEligible(r) && r.weightFK===weight).sort((a,b)=>b.elo-a.elo);
-  const host = document.getElementById('gap-target-browser');
-  if(!list.length){
-    host.innerHTML = `<strong>${weight} lbs open targets</strong><div style="margin-top:.4rem;color:var(--text3)">No currently open portal / uncommitted HS / international targets in this weight.</div>`;
-    return;
-  }
-  host.innerHTML = `
-    <div style="display:flex;justify-content:space-between;align-items:center;gap:.75rem;flex-wrap:wrap">
-      <strong>${weight} lbs open targets (${list.length})</strong>
-      <span style="font-size:.72rem;color:var(--text3)">Only open athletes are shown. Committed/ineligible athletes auto-removed.</span>
-    </div>
-    <div style="max-height:260px;overflow:auto;margin-top:.6rem;border-top:1px solid var(--border)">
-      ${list.map(r=>`
-      <div style="display:flex;justify-content:space-between;gap:.75rem;padding:.45rem 0;border-bottom:1px solid var(--border);font-size:.78rem">
-        <span>${r.name} • ${r.school} • ${r.yearFull} <span class="r-type-badge ${r.type==='transfer'?'r-transfer':'r-hs'}" style="margin-left:.25rem">${r.type==='transfer'?'Portal':'HS'}</span></span>
-        <span style="color:var(--gold);font-weight:700">${r.elo}</span>
-      </div>`).join('')}
-    </div>`;
 }
 
 function openWeightComparison(weight, selectedIdx){
@@ -1747,7 +1653,7 @@ function openWeightComparison(weight, selectedIdx){
 function populateMatchupSelects(){
   const w = parseInt(document.getElementById('mu-weight').value)||157;
   currentWeight = w;
-  const list = getWeightPool(w);
+  const list = WRESTLERS[w]||[];
   const opts = list.map((x,i)=>`<option value="${i}">${x.name} (${x.school})</option>`).join('');
   document.getElementById('mu-a').innerHTML = opts;
   document.getElementById('mu-b').innerHTML = opts;
@@ -1756,7 +1662,7 @@ function populateMatchupSelects(){
 
 function runMatchup(){
   const w = parseInt(document.getElementById('mu-weight').value)||165;
-  const list = getWeightPool(w);
+  const list = WRESTLERS[w]||[];
   const ai = parseInt(document.getElementById('mu-a').value)||0;
   const bi = parseInt(document.getElementById('mu-b').value)||1;
   
